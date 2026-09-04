@@ -41,7 +41,7 @@ function AddExpense() {
 
   return (
     <>
-      <PageHeader title="Add expense" sub="Record a business cost" rightText="Admin" />
+      <PageHeader title="Add expense" sub="Record a business cost" />
       
       <div className="card-panel p-6 md:p-8 max-w-2xl">
         <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleAdd}>

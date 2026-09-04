@@ -74,7 +74,7 @@ function RecordPayment() {
 
   return (
     <>
-      <PageHeader title="Record payment" sub="Add income to a booking" rightText="Admin" />
+      <PageHeader title="Record payment" sub="Add income to a booking" />
       
       <div className="card-panel p-6 md:p-8 max-w-2xl">
         <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSave}>

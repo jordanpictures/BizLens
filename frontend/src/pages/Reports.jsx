@@ -90,7 +90,7 @@ function Reports() {
       <PageHeader
         title="Reports"
         sub="Track your performance"
-        rightText="Admin"
+       
       />
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">

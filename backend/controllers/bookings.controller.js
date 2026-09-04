@@ -62,6 +62,7 @@ exports.createBooking = async (req, res) => {
     agreed_price,
     notes,
     amount_paid,
+    payment_method,
   } = req.body;
 
   try {
@@ -95,7 +96,12 @@ exports.createBooking = async (req, res) => {
       await db.query(
         `INSERT INTO payments (booking_id, amount, payment_method, date, notes) 
          VALUES ($1, $2, $3, CURRENT_DATE, $4)`,
-        [booking.id, amount_paid, "Cash", "Initial payment upon booking"],
+        [
+          booking.id,
+          amount_paid,
+          payment_method || "Cash",
+          "Initial payment upon booking",
+        ],
       );
     }
 

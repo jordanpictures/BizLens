@@ -72,7 +72,7 @@ function Payments() {
       <PageHeader
         title="Payments"
         sub="Income received from bookings"
-        rightText="Admin"
+       
       />
 
       {loading ? (

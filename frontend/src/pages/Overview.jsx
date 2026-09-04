@@ -55,7 +55,7 @@ function Overview() {
       <PageHeader
         title="Overview"
         sub={formatDate(new Date())}
-        rightText="Admin"
+       
       />
 
       {loading ? (

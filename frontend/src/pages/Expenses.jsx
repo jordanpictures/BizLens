@@ -49,7 +49,7 @@ function Expenses() {
 
   return (
     <>
-      <PageHeader title="Expenses" sub="Business costs" rightText="Admin" />
+      <PageHeader title="Expenses" sub="Business costs" />
 
       {loading ? (
         <div className="p-8 text-center text-muted">Loading expenses...</div>

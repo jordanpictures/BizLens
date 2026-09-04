@@ -202,18 +202,7 @@ function Sidebar() {
           )}
         </nav>
 
-        <div className="mt-auto border-t border-line pt-4 flex flex-col gap-1">
-          <div className="px-3 py-1.5 text-xs text-muted mb-2">
-            Logged in as <b className="text-text">{user?.username}</b> (
-            {user?.role})
-          </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-2.5 px-3 py-1.5 text-[15px] rounded-lg text-red-600 hover:bg-red-50 text-left transition-colors"
-          >
-            <Icons.Logout /> Logout
-          </button>
-        </div>
+        <div className="mt-auto hidden"></div>
       </aside>
 
       {/* Mobile Bottom Navigation */}
