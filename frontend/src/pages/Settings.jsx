@@ -81,8 +81,7 @@ function Settings() {
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
-              className="input-field flex-1" 
-              {/* placeholder="E.g., Consultation, Basic Repair..."  */}
+              className="input-field flex-1"
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd('service', newService)}
@@ -106,8 +105,7 @@ function Settings() {
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
-              className="input-field flex-1" 
-              {/* placeholder="E.g., Premium, Standard..."  */}
+              className="input-field flex-1"
               value={newPackage}
               onChange={(e) => setNewPackage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd('package', newPackage)}
