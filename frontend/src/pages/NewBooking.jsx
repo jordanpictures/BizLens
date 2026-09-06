@@ -127,7 +127,7 @@ function NewBooking() {
           </div>
           <div>
             <label className="block text-muted text-sm font-medium mb-2">
-              Service type
+              Service Category
             </label>
             <select
               name="service_type"
