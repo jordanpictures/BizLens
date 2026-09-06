@@ -82,7 +82,7 @@ function Settings() {
             <input 
               type="text" 
               className="input-field flex-1" 
-              placeholder="E.g., Consultation, Basic Repair..." 
+              {/* placeholder="E.g., Consultation, Basic Repair..."  */}
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd('service', newService)}
@@ -107,7 +107,7 @@ function Settings() {
             <input 
               type="text" 
               className="input-field flex-1" 
-              placeholder="E.g., Premium, Standard..." 
+              {/* placeholder="E.g., Premium, Standard..."  */}
               value={newPackage}
               onChange={(e) => setNewPackage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd('package', newPackage)}
