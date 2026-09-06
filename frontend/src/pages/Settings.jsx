@@ -77,7 +77,7 @@ function Settings() {
         
         {/* Services Manager */}
         <div className="card-panel p-6">
-          <h3 className="font-semibold text-lg mb-4">Service Types</h3>
+          <h3 className="font-semibold text-lg mb-4">Service Categories</h3>
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
