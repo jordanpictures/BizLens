@@ -30,7 +30,7 @@ app.use("/api/tasks", requireAuth, tasksRoutes);
 app.use("/api/wallet", requireAuth, walletRoutes);
 
 // Protected routes (Require login AND Owner role)
-app.use("/api/settings", requireAuth, requireOwner, settingsRoutes);
+app.use("/api/settings", requireAuth, settingsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

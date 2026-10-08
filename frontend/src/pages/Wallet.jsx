@@ -42,7 +42,9 @@ function Wallet() {
 
   // Filters
   const [typeFilter, setTypeFilter] = useState("all");
+  const [memberFilter, setMemberFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [allTransactions, setAllTransactions] = useState([]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -55,12 +57,18 @@ function Wallet() {
         setPersonalData(data);
       }
 
-      // If owner, fetch company overview
+      // If owner, fetch company overview and all company transactions
       if (isOwner) {
         const resOverview = await fetch("/api/wallet/overview");
         if (resOverview.ok) {
           const data = await resOverview.json();
           setOverviewData(data);
+        }
+
+        const resTx = await fetch("/api/wallet/transactions");
+        if (resTx.ok) {
+          const data = await resTx.json();
+          setAllTransactions(data);
         }
       }
     } catch (err) {
@@ -128,11 +136,13 @@ function Wallet() {
     }
   };
 
-  // Filtered transactions
+  // Filtered transactions (Owner sees all company transactions; members see own)
   const displayedTransactions = useMemo(() => {
-    const list = personalData.transactions || [];
+    const list = isOwner ? allTransactions : personalData.transactions || [];
     return list.filter((t) => {
       if (typeFilter !== "all" && t.type !== typeFilter) return false;
+      if (isOwner && memberFilter !== "all" && t.user_id !== memberFilter)
+        return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         const matchesType = t.type?.toLowerCase().includes(q);
@@ -140,17 +150,26 @@ function Wallet() {
         const matchesTask = t.task_title?.toLowerCase().includes(q);
         const matchesCustomer = t.customer_name?.toLowerCase().includes(q);
         const matchesCreator = t.created_by_username?.toLowerCase().includes(q);
+        const matchesMember = t.member_username?.toLowerCase().includes(q);
         return (
           matchesType ||
           matchesNote ||
           matchesTask ||
           matchesCustomer ||
-          matchesCreator
+          matchesCreator ||
+          matchesMember
         );
       }
       return true;
     });
-  }, [personalData.transactions, typeFilter, search]);
+  }, [
+    isOwner,
+    allTransactions,
+    personalData.transactions,
+    typeFilter,
+    memberFilter,
+    search,
+  ]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -594,6 +613,22 @@ function Wallet() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {/* Filter by Member (Owner only) */}
+            {isOwner && overviewData.team_wallets.length > 0 && (
+              <select
+                value={memberFilter}
+                onChange={(e) => setMemberFilter(e.target.value)}
+                className="text-xs px-2.5 py-1.5 rounded-lg border border-line bg-white focus:outline-hidden focus:border-neutral-800 transition-colors"
+              >
+                <option value="all">All Members</option>
+                {overviewData.team_wallets.map((tm) => (
+                  <option key={tm.user_id} value={tm.user_id}>
+                    {tm.username}
+                  </option>
+                ))}
+              </select>
+            )}
+
             {/* Filter buttons */}
             <div className="flex bg-neutral-100 p-0.5 rounded-lg border border-neutral-200">
               {["all", "Reward", "Withdrawal"].map((tp) => (
@@ -615,7 +650,11 @@ function Wallet() {
             {/* Search Input */}
             <input
               type="text"
-              placeholder="Search notes, task..."
+              placeholder={
+                isOwner
+                  ? "Search member, notes, task..."
+                  : "Search notes, task..."
+              }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="text-xs px-3 py-1.5 rounded-lg border border-line bg-white focus:outline-hidden focus:border-neutral-800 transition-colors"
@@ -634,6 +673,9 @@ function Wallet() {
               <thead>
                 <tr className="border-b border-line text-neutral-500 uppercase tracking-wider text-[11px]">
                   <th className="pb-3 font-semibold">Date</th>
+                  {isOwner && (
+                    <th className="pb-3 font-semibold">Team Member</th>
+                  )}
                   <th className="pb-3 font-semibold">Type</th>
                   <th className="pb-3 font-semibold">Description / Notes</th>
                   <th className="pb-3 font-semibold">Status</th>
@@ -651,6 +693,16 @@ function Wallet() {
                       <td className="py-3 text-neutral-600 whitespace-nowrap">
                         {formatDate(tx.created_at, true)}
                       </td>
+                      {isOwner && (
+                        <td className="py-3 whitespace-nowrap">
+                          <div className="font-semibold text-neutral-900">
+                            {tx.member_username || "—"}
+                          </div>
+                          <div className="text-[10px] text-neutral-400">
+                            {tx.member_position || tx.member_role || ""}
+                          </div>
+                        </td>
+                      )}
                       <td className="py-3">
                         <span
                           className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${getTypeBadge(tx.type)}`}

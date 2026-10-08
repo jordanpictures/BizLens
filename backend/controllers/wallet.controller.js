@@ -120,11 +120,9 @@ exports.requestWithdrawal = async (req, res) => {
 
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || isNaN(parsedAmount) || parsedAmount <= 0) {
-      return res
-        .status(400)
-        .json({
-          error: "Please enter a valid withdrawal amount greater than 0",
-        });
+      return res.status(400).json({
+        error: "Please enter a valid withdrawal amount greater than 0",
+      });
     }
 
     // Check available balance
@@ -292,7 +290,7 @@ exports.getTransactions = async (req, res) => {
       query += ` AND wt.task_id = $${params.length}`;
     }
 
-    query += ` ORDER BY wt.created_at DESC LIMIT 200`;
+    query += ` ORDER BY wt.created_at DESC LIMIT 1000`;
 
     const { rows } = await db.query(query, params);
     res.json(rows);
