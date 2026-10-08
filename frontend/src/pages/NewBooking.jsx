@@ -8,14 +8,18 @@ function NewBooking() {
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]);
 
+  const pad = (n) => n.toString().padStart(2, "0");
   const formatForInput = (d) => {
-    const pad = (n) => n.toString().padStart(2, "0");
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const formatForDateInput = (d) => {
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   };
 
   const now = new Date();
   const defaultStart = formatForInput(now);
   const defaultEnd = formatForInput(new Date(now.getTime() + 5 * 60000));
+  const defaultDueDate = formatForDateInput(now);
 
   const [formData, setFormData] = useState({
     customer_name: "",
@@ -25,6 +29,7 @@ function NewBooking() {
     quantity: 1,
     start_time: defaultStart,
     end_time: defaultEnd,
+    due_date: "",
     agreed_price: "",
     amount_paid: "",
     payment_method: "Cash",
@@ -88,11 +93,7 @@ function NewBooking() {
 
   return (
     <>
-      <PageHeader
-        title="New booking"
-        sub="Create a booking"
-       
-      />
+      <PageHeader title="New booking" sub="Create a booking" />
 
       <div className="card-panel p-6 md:p-8 max-w-4xl">
         <form
@@ -173,7 +174,7 @@ function NewBooking() {
               )}
             </div>
           </div>
-          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
                 Start time
@@ -196,6 +197,18 @@ function NewBooking() {
                 type="datetime-local"
                 name="end_time"
                 value={formData.end_time}
+                onChange={handleChange}
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="block text-muted text-sm font-medium mb-2">
+                Due date (Optional)
+              </label>
+              <input
+                type="date"
+                name="due_date"
+                value={formData.due_date}
                 onChange={handleChange}
                 className="input-field"
               />

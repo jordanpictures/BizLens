@@ -26,14 +26,25 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        position: user.position,
+      },
       JWT_SECRET,
       { expiresIn: "7d" },
     );
 
     res.json({
       token,
-      user: { id: user.id, username: user.username, role: user.role },
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        position: user.position,
+        salary: user.salary,
+      },
     });
   } catch (err) {
     console.error("Login error:", err);
@@ -41,6 +52,18 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.getMe = (req, res) => {
-  res.json({ user: req.user });
+exports.getMe = async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      "SELECT id, username, role, position, salary, is_active FROM users WHERE id = $1",
+      [req.user.id],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ user: rows[0] });
+  } catch (err) {
+    console.error("getMe error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 };

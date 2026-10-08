@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import { money, formatDate, downloadCSV } from "../utils/format";
 
 function Payments() {
-  const navigate = useNavigate();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [methodFilter, setMethodFilter] = useState("all"); // 'all', 'Cash', 'Transfer'
 
   useEffect(() => {
     fetch("/api/payments")
@@ -24,7 +24,7 @@ function Payments() {
       });
   }, []);
 
-  const filteredPayments = payments.filter((p) => {
+  const dateFilteredPayments = payments.filter((p) => {
     if (!startDate && !endDate) return true;
     const pDate = new Date(p.date).setHours(0, 0, 0, 0);
     const sDate = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : 0;
@@ -32,14 +32,19 @@ function Payments() {
     return pDate >= sDate && pDate < eDate;
   });
 
-  const totalIncome = filteredPayments.reduce(
+  const filteredPayments = dateFilteredPayments.filter((p) => {
+    if (methodFilter === "all") return true;
+    return p.payment_method?.toLowerCase() === methodFilter.toLowerCase();
+  });
+
+  const totalIncome = dateFilteredPayments.reduce(
     (a, x) => a + parseFloat(x.amount),
     0,
   );
-  const cashTotal = filteredPayments
+  const cashTotal = dateFilteredPayments
     .filter((p) => p.payment_method === "Cash")
     .reduce((a, x) => a + parseFloat(x.amount), 0);
-  const transferTotal = filteredPayments
+  const transferTotal = dateFilteredPayments
     .filter((p) => p.payment_method === "Transfer")
     .reduce((a, x) => a + parseFloat(x.amount), 0);
 
@@ -61,78 +66,131 @@ function Payments() {
       p.booking_id || "",
     ]);
     downloadCSV(
-      `Payments_Export_${startDate || "All"}_to_${endDate || "All"}.csv`,
+      `Payments_Export_${methodFilter !== "all" ? methodFilter + "_" : ""}${startDate || "All"}_to_${endDate || "All"}.csv`,
       headers,
       data,
     );
   };
 
+  const getMethodBtnClass = (m) =>
+    `px-3 py-1.5 rounded-lg text-sm transition-all cursor-pointer ${
+      methodFilter === m
+        ? "bg-white text-text shadow-sm ring-1 ring-neutral-200 font-medium"
+        : "text-neutral-500 hover:text-text"
+    }`;
+
   return (
     <>
-      <PageHeader
-        title="Payments"
-        sub="Income received from bookings"
-       
-      />
+      <PageHeader title="Payments" sub="Income received from bookings" />
 
       {loading ? (
         <div className="p-8 text-center text-muted">Loading payments...</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="card-panel p-5">
+            <div
+              className={`card-panel p-5 cursor-pointer transition-all ${
+                methodFilter === "all"
+                  ? "ring-2 ring-neutral-900 bg-neutral-50/50"
+                  : "hover:border-neutral-400"
+              }`}
+              onClick={() => setMethodFilter("all")}
+              title="Click to view all payments"
+            >
               <div className="text-muted text-sm mb-3">Total income</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(totalIncome)}
               </div>
             </div>
-            <div className="card-panel p-5">
+            <div
+              className={`card-panel p-5 cursor-pointer transition-all ${
+                methodFilter === "Cash"
+                  ? "ring-2 ring-neutral-900 bg-neutral-50/50"
+                  : "hover:border-neutral-400"
+              }`}
+              onClick={() => setMethodFilter("Cash")}
+              title="Click to filter by Cash payments"
+            >
               <div className="text-muted text-sm mb-3">Cash</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(cashTotal)}
               </div>
             </div>
-            <div className="card-panel p-5">
+            <div
+              className={`card-panel p-5 cursor-pointer transition-all ${
+                methodFilter === "Transfer"
+                  ? "ring-2 ring-neutral-900 bg-neutral-50/50"
+                  : "hover:border-neutral-400"
+              }`}
+              onClick={() => setMethodFilter("Transfer")}
+              title="Click to filter by Transfer payments"
+            >
               <div className="text-muted text-sm mb-3">Transfer</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(transferTotal)}
               </div>
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Payments</div>
+              <div className="text-muted text-sm mb-3">
+                {methodFilter !== "all"
+                  ? `${methodFilter} Payments`
+                  : "Total Payments"}
+              </div>
               <div className="text-3xl font-bold tracking-tight">
-                {payments.length}
+                {filteredPayments.length}
               </div>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-4">
-            <div className="flex gap-2 w-full md:w-auto">
-              <input
-                type="date"
-                className="input-field !py-2 flex-1 md:w-40"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                title="From Date"
-              />
-              <span className="text-muted self-center">-</span>
-              <input
-                type="date"
-                className="input-field !py-2 flex-1 md:w-40"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                title="Up to Date (Excluded)"
-              />
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <input
+                  type="date"
+                  className="input-field !py-2 flex-1 sm:w-40"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  title="From Date"
+                />
+                <span className="text-muted self-center">-</span>
+                <input
+                  type="date"
+                  className="input-field !py-2 flex-1 sm:w-40"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  title="Up to Date (Excluded)"
+                />
+              </div>
+
+              {/* Payment Method Filter Pills */}
+              <div className="flex gap-1 bg-neutral-100 rounded-xl p-1">
+                <button
+                  type="button"
+                  className={getMethodBtnClass("all")}
+                  onClick={() => setMethodFilter("all")}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className={getMethodBtnClass("Cash")}
+                  onClick={() => setMethodFilter("Cash")}
+                >
+                  Cash
+                </button>
+                <button
+                  type="button"
+                  className={getMethodBtnClass("Transfer")}
+                  onClick={() => setMethodFilter("Transfer")}
+                >
+                  Transfer
+                </button>
+              </div>
             </div>
+
             <div className="flex gap-2 shrink-0">
               <button className="btn-secondary" onClick={handleExport}>
                 Export CSV
-              </button>
-              <button
-                className="btn"
-                onClick={() => navigate("/record-payment")}
-              >
-                + Record payment
               </button>
             </div>
           </div>
@@ -148,7 +206,7 @@ function Payments() {
 
             {filteredPayments.length === 0 ? (
               <div className="p-8 text-center text-muted">
-                No payments found.
+                No payments found matching the selected filters.
               </div>
             ) : (
               filteredPayments.map((x) => (
@@ -170,7 +228,13 @@ function Payments() {
                     </Link>
                   </div>
                   <div className="hidden md:block">
-                    <span className="inline-block bg-neutral-100 text-neutral-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                    <span
+                      className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${
+                        x.payment_method === "Cash"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
                       {x.payment_method}
                     </span>
                   </div>

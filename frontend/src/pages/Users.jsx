@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PageHeader from "../components/PageHeader";
+import { money } from "../utils/format";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -9,12 +10,16 @@ function Users() {
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("Receptionist");
+  const [newPosition, setNewPosition] = useState("");
+  const [newSalary, setNewSalary] = useState("");
 
   // Edit form state
   const [editingId, setEditingId] = useState(null);
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [editRole, setEditRole] = useState("Receptionist");
+  const [editPosition, setEditPosition] = useState("");
+  const [editSalary, setEditSalary] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -42,12 +47,16 @@ function Users() {
           username: newUsername,
           password: newPassword,
           role: newRole,
+          position: newPosition.trim() || null,
+          salary: newSalary !== "" ? parseFloat(newSalary) : null,
         }),
       });
       if (res.ok) {
         setNewUsername("");
         setNewPassword("");
         setNewRole("Receptionist");
+        setNewPosition("");
+        setNewSalary("");
         fetchUsers();
       } else {
         const data = await res.json();
@@ -62,6 +71,8 @@ function Users() {
     setEditingId(u.id);
     setEditUsername(u.username);
     setEditRole(u.role);
+    setEditPosition(u.position || "");
+    setEditSalary(u.salary !== null && u.salary !== undefined ? u.salary : "");
     setEditPassword(""); // leave blank unless changing
   };
 
@@ -75,6 +86,8 @@ function Users() {
           username: editUsername,
           password: editPassword,
           role: editRole,
+          position: editPosition.trim() || null,
+          salary: editSalary !== "" ? parseFloat(editSalary) : null,
         }),
       });
       if (res.ok) {
@@ -138,14 +151,14 @@ function Users() {
         <div className="flex flex-wrap gap-3">
           <input
             type="text"
-            className="input-field flex-1 min-w-[150px]"
+            className="input-field flex-1 min-w-[140px]"
             placeholder="Username"
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
           />
           <input
             type="password"
-            className="input-field flex-1 min-w-[150px]"
+            className="input-field flex-1 min-w-[140px]"
             placeholder="Password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
@@ -156,8 +169,24 @@ function Users() {
             onChange={(e) => setNewRole(e.target.value)}
           >
             <option value="Receptionist">Receptionist</option>
+            <option value="Team Member">Team Member</option>
             <option value="Owner">Owner</option>
           </select>
+          <input
+            type="text"
+            className="input-field flex-1 min-w-[140px]"
+            placeholder="Position"
+            value={newPosition}
+            onChange={(e) => setNewPosition(e.target.value)}
+          />
+          <input
+            type="number"
+            step="any"
+            className="input-field w-[130px]"
+            placeholder="Salary (ETB)"
+            value={newSalary}
+            onChange={(e) => setNewSalary(e.target.value)}
+          />
           <button className="btn" onClick={handleCreate}>
             Create User
           </button>
@@ -170,10 +199,12 @@ function Users() {
         </div>
 
         <div className="overflow-x-auto">
-          <div className="min-w-[600px] divide-y divide-line">
-            <div className="grid grid-cols-[1fr_1fr_200px] text-xs uppercase tracking-wider text-muted font-semibold py-3 px-6 bg-neutral-50">
+          <div className="min-w-[800px] divide-y divide-line">
+            <div className="grid grid-cols-[1.2fr_1fr_1.2fr_1fr_200px] text-xs uppercase tracking-wider text-muted font-semibold py-3 px-6 bg-neutral-50">
               <div>Username</div>
               <div>Role</div>
+              <div>Position</div>
+              <div>Salary</div>
               <div className="text-right">Action</div>
             </div>
 
@@ -188,24 +219,41 @@ function Users() {
                     <input
                       type="text"
                       className="input-field flex-1 !py-1 min-w-[120px]"
+                      placeholder="Username"
                       value={editUsername}
                       onChange={(e) => setEditUsername(e.target.value)}
                     />
                     <input
                       type="password"
-                      className="input-field flex-1 !py-1 min-w-[150px]"
-                      placeholder="New Password (or leave blank)"
+                      className="input-field flex-1 !py-1 min-w-[130px]"
+                      placeholder="New Password (optional)"
                       value={editPassword}
                       onChange={(e) => setEditPassword(e.target.value)}
                     />
                     <select
-                      className="input-field !py-1 appearance-none bg-white min-w-[120px]"
+                      className="input-field !py-1 appearance-none bg-white min-w-[130px]"
                       value={editRole}
                       onChange={(e) => setEditRole(e.target.value)}
                     >
                       <option value="Receptionist">Receptionist</option>
+                      <option value="Team Member">Team Member</option>
                       <option value="Owner">Owner</option>
                     </select>
+                    <input
+                      type="text"
+                      className="input-field flex-1 !py-1 min-w-[120px]"
+                      placeholder="Position"
+                      value={editPosition}
+                      onChange={(e) => setEditPosition(e.target.value)}
+                    />
+                    <input
+                      type="number"
+                      step="any"
+                      className="input-field !py-1 w-[120px]"
+                      placeholder="Salary"
+                      value={editSalary}
+                      onChange={(e) => setEditSalary(e.target.value)}
+                    />
                     <div className="flex gap-2">
                       <button className="btn !py-1" onClick={handleUpdate}>
                         Save
@@ -220,7 +268,7 @@ function Users() {
                   </div>
                 ) : (
                   // View Mode
-                  <div className="grid grid-cols-[1fr_1fr_200px] items-center">
+                  <div className="grid grid-cols-[1.2fr_1fr_1.2fr_1fr_200px] items-center">
                     <div className="text-sm font-medium">
                       {u.username}
                       {!u.is_active && (
@@ -231,10 +279,24 @@ function Users() {
                     </div>
                     <div>
                       <span
-                        className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${u.role === "Owner" ? "bg-neutral-800 text-white" : "bg-neutral-100 text-neutral-700"}`}
+                        className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          u.role === "Owner"
+                            ? "bg-neutral-800 text-white"
+                            : u.role === "Team Member"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-neutral-100 text-neutral-700"
+                        }`}
                       >
                         {u.role}
                       </span>
+                    </div>
+                    <div className="text-sm text-neutral-600">
+                      {u.position || "—"}
+                    </div>
+                    <div className="text-sm font-medium text-neutral-800">
+                      {u.salary != null && !isNaN(parseFloat(u.salary))
+                        ? money(parseFloat(u.salary))
+                        : "—"}
                     </div>
                     <div className="text-right flex justify-end gap-3">
                       <button
@@ -244,7 +306,11 @@ function Users() {
                         Edit
                       </button>
                       <button
-                        className={`${u.is_active ? "text-amber-600 hover:text-amber-800" : "text-green-600 hover:text-green-800"} text-sm font-medium transition-colors`}
+                        className={`${
+                          u.is_active
+                            ? "text-amber-600 hover:text-amber-800"
+                            : "text-green-600 hover:text-green-800"
+                        } text-sm font-medium transition-colors`}
                         onClick={() => handleToggleActive(u.id, !u.is_active)}
                       >
                         {u.is_active ? "Deactivate" : "Activate"}

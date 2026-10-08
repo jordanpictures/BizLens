@@ -15,7 +15,9 @@ function PageHeader({ title, sub }) {
       <div className="flex items-center gap-4">
         <div className="text-right hidden sm:block">
           <div className="text-sm font-bold text-text">{user?.username}</div>
-          <div className="text-xs text-muted font-medium">{user?.role}</div>
+          <div className="text-xs text-muted font-medium">
+            {user.position || user?.role}
+          </div>
         </div>
         <button
           onClick={logout}

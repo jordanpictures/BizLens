@@ -101,6 +101,37 @@ const Icons = {
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
     </svg>
   ),
+  Tasks: () => (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 11l3 3L22 4"></path>
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+    </svg>
+  ),
+  Wallet: () => (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+      <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+      <circle cx="18" cy="14" r="1.5"></circle>
+    </svg>
+  ),
   Users: () => (
     <svg
       width="18"
@@ -142,6 +173,8 @@ function Sidebar() {
   // Use .env configured name, fallback to "service."
   const companyName = import.meta.env.VITE_COMPANY_NAME || "service.";
 
+  const isTeamMember = user?.role === "Team Member";
+
   const linkClass = ({ isActive }) =>
     `flex items-center gap-2.5 px-3 py-1.5 text-[15px] rounded-lg text-muted no-underline transition-colors ${
       isActive
@@ -170,34 +203,56 @@ function Sidebar() {
             {companyName}
           </div>
         </div>
-        <nav className="flex flex-col gap-0.5 flex-1">
-          <NavLink to="/" end className={linkClass}>
-            <Icons.Overview /> Overview
-          </NavLink>
-          <NavLink to="/bookings" className={linkClass}>
-            <Icons.Bookings /> Bookings
-          </NavLink>
-          <NavLink to="/payments" className={linkClass}>
-            <Icons.Payments /> Payments
-          </NavLink>
-          <NavLink to="/expenses" className={linkClass}>
-            <Icons.Expenses /> Expenses
-          </NavLink>
-          <NavLink to="/reports" className={linkClass}>
-            <Icons.Reports /> Reports
-          </NavLink>
 
-          {user?.role === "Owner" && (
+        <nav className="flex flex-col gap-0.5 flex-1">
+          {isTeamMember ? (
+            /* Team Members see Tasks and Wallet */
             <>
-              <div className="mt-6 mb-1.5 px-3 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                System
-              </div>
-              <NavLink to="/users" className={linkClass}>
-                <Icons.Users /> Users
+              <NavLink to="/tasks" className={linkClass}>
+                <Icons.Tasks /> Tasks
               </NavLink>
-              <NavLink to="/settings" className={linkClass}>
-                <Icons.Settings /> Settings
+              <NavLink to="/wallet" className={linkClass}>
+                <Icons.Wallet /> Wallet
               </NavLink>
+            </>
+          ) : (
+            /* Owners & Staff see standard navigation */
+            <>
+              <NavLink to="/" end className={linkClass}>
+                <Icons.Overview /> Overview
+              </NavLink>
+              <NavLink to="/bookings" className={linkClass}>
+                <Icons.Bookings /> Bookings
+              </NavLink>
+              <NavLink to="/tasks" className={linkClass}>
+                <Icons.Tasks /> Tasks
+              </NavLink>
+              <NavLink to="/payments" className={linkClass}>
+                <Icons.Payments /> Payments
+              </NavLink>
+              <NavLink to="/expenses" className={linkClass}>
+                <Icons.Expenses /> Expenses
+              </NavLink>
+              <NavLink to="/reports" className={linkClass}>
+                <Icons.Reports /> Reports
+              </NavLink>
+              <NavLink to="/wallet" className={linkClass}>
+                <Icons.Wallet /> Wallet
+              </NavLink>
+
+              {user?.role === "Owner" && (
+                <>
+                  <div className="mt-6 mb-1.5 px-3 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                    System
+                  </div>
+                  <NavLink to="/users" className={linkClass}>
+                    <Icons.Users /> Users
+                  </NavLink>
+                  <NavLink to="/settings" className={linkClass}>
+                    <Icons.Settings /> Settings
+                  </NavLink>
+                </>
+              )}
             </>
           )}
         </nav>
@@ -207,36 +262,59 @@ function Sidebar() {
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-line flex justify-around items-center pb-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-        <NavLink to="/" end className={mobileLinkClass}>
-          <Icons.Overview />
-          <span className="mt-1">Home</span>
-        </NavLink>
-        <NavLink to="/bookings" className={mobileLinkClass}>
-          <Icons.Bookings />
-          <span className="mt-1">Bookings</span>
-        </NavLink>
-        <NavLink to="/payments" className={mobileLinkClass}>
-          <Icons.Payments />
-          <span className="mt-1">Payments</span>
-        </NavLink>
-        <NavLink to="/expenses" className={mobileLinkClass}>
-          <Icons.Expenses />
-          <span className="mt-1">Expenses</span>
-        </NavLink>
-        <NavLink to="/reports" className={mobileLinkClass}>
-          <Icons.Reports />
-          <span className="mt-1">Reports</span>
-        </NavLink>
-        {user?.role === "Owner" && (
+        {isTeamMember ? (
           <>
-            <NavLink to="/users" className={mobileLinkClass}>
-              <Icons.Users />
-              <span className="mt-1">Users</span>
+            <NavLink to="/tasks" className={mobileLinkClass}>
+              <Icons.Tasks />
+              <span className="mt-1">Tasks</span>
             </NavLink>
-            <NavLink to="/settings" className={mobileLinkClass}>
-              <Icons.Settings />
-              <span className="mt-1">Settings</span>
+            <NavLink to="/wallet" className={mobileLinkClass}>
+              <Icons.Wallet />
+              <span className="mt-1">Wallet</span>
             </NavLink>
+          </>
+        ) : (
+          <>
+            <NavLink to="/" end className={mobileLinkClass}>
+              <Icons.Overview />
+              <span className="mt-1">Home</span>
+            </NavLink>
+            <NavLink to="/bookings" className={mobileLinkClass}>
+              <Icons.Bookings />
+              <span className="mt-1">Bookings</span>
+            </NavLink>
+            <NavLink to="/tasks" className={mobileLinkClass}>
+              <Icons.Tasks />
+              <span className="mt-1">Tasks</span>
+            </NavLink>
+            <NavLink to="/payments" className={mobileLinkClass}>
+              <Icons.Payments />
+              <span className="mt-1">Payments</span>
+            </NavLink>
+            <NavLink to="/expenses" className={mobileLinkClass}>
+              <Icons.Expenses />
+              <span className="mt-1">Expenses</span>
+            </NavLink>
+            <NavLink to="/reports" className={mobileLinkClass}>
+              <Icons.Reports />
+              <span className="mt-1">Reports</span>
+            </NavLink>
+            <NavLink to="/wallet" className={mobileLinkClass}>
+              <Icons.Wallet />
+              <span className="mt-1">Wallet</span>
+            </NavLink>
+            {user?.role === "Owner" && (
+              <>
+                <NavLink to="/users" className={mobileLinkClass}>
+                  <Icons.Users />
+                  <span className="mt-1">Users</span>
+                </NavLink>
+                <NavLink to="/settings" className={mobileLinkClass}>
+                  <Icons.Settings />
+                  <span className="mt-1">Settings</span>
+                </NavLink>
+              </>
+            )}
           </>
         )}
       </div>

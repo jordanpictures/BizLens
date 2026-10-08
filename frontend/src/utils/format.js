@@ -13,6 +13,18 @@ export const getStatusClass = (s) => {
 
 export const formatDate = (dateString, includeTime = false) => {
   if (!dateString) return "";
+  if (
+    typeof dateString === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(dateString.trim())
+  ) {
+    const [y, m, d] = dateString.trim().split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
   const date = new Date(dateString);
   const options = { year: "numeric", month: "short", day: "numeric" };
   if (includeTime) {
