@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
+  const { t } = useTranslation();
   const [teamMembers, setTeamMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -148,12 +150,12 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-neutral-900"></span>
               <h3 className="text-lg font-bold text-neutral-900 m-0">
-                Assign Order / Task
+                {t("assign_modal.title")}
               </h3>
             </div>
             <p className="text-xs text-neutral-500 mt-1">
-              {booking.service_type} · {booking.customer_name || "Walk-in"}
-              {booking.due_date && ` · Due ${booking.due_date}`}
+              {booking.service_type} · {booking.customer_name || t("tasks.walk_in", "Walk-in Customer")}
+              {booking.due_date && ` · ${t("tasks.due_date", "Due Date")} ${booking.due_date}`}
             </p>
           </div>
           <button
@@ -170,7 +172,7 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
           {/* Team Members Multi-Select */}
           <div ref={dropdownRef} className="relative">
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Assign Team Member(s) *
+              {t("assign_modal.member_label")}
             </label>
 
             {/* Selected Chips container & Dropdown trigger */}
@@ -180,7 +182,7 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
             >
               {selectedObjects.length === 0 ? (
                 <span className="text-sm text-neutral-400 px-2 py-0.5">
-                  Click to select team members...
+                  {t("assign_modal.select_ph")}
                 </span>
               ) : (
                 selectedObjects.map((m) => (
@@ -214,7 +216,7 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
                   <input
                     type="text"
                     className="w-full px-3 py-1.5 text-sm bg-white border border-line rounded-lg focus:outline-hidden focus:border-neutral-800"
-                    placeholder="Search by name or position..."
+                    placeholder={t("assign_modal.search_ph")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     autoFocus
@@ -225,11 +227,11 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
                 <div className="max-h-52 overflow-y-auto py-1">
                   {loadingMembers ? (
                     <div className="p-4 text-center text-xs text-neutral-400">
-                      Loading team members...
+                      {t("assign_modal.loading")}
                     </div>
                   ) : filteredMembers.length === 0 ? (
                     <div className="p-4 text-center text-xs text-neutral-400">
-                      No team members found
+                      {t("assign_modal.no_members")}
                     </div>
                   ) : (
                     filteredMembers.map((m) => {
@@ -282,11 +284,10 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
               />
               <div>
                 <span className="text-xs font-semibold text-neutral-900 block">
-                  Show customer info (name and phone number)
+                  {t("assign_modal.show_customer_info")}
                 </span>
                 <span className="text-[11px] text-neutral-500 block mt-0.5">
-                  When checked, assigned team members can see client name and
-                  phone number. If unchecked, client info is hidden from them.
+                  {t("assign_modal.show_customer_info_hint")}
                 </span>
               </div>
             </label>
@@ -295,12 +296,12 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
           {/* Note Section */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Assignment Notes / Instructions
+              {t("assign_modal.notes_label")}
             </label>
             <textarea
               rows={3}
               className="w-full p-3 text-sm bg-white border border-line rounded-xl focus:outline-hidden focus:border-neutral-800 transition-colors"
-              placeholder="You are assigned"
+              placeholder={t("assign_modal.notes_default")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
@@ -309,25 +310,29 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
           {/* Priority */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Priority
+              {t("assign_modal.priority_label")}
             </label>
             <div className="flex gap-2">
-              {["Normal", "High", "Urgent"].map((p) => (
+              {[
+                { key: "Normal", label: t("assign_modal.normal") },
+                { key: "High", label: t("assign_modal.high") },
+                { key: "Urgent", label: t("assign_modal.urgent") },
+              ].map(({ key, label }) => (
                 <button
-                  key={p}
+                  key={key}
                   type="button"
-                  onClick={() => setPriority(p)}
+                  onClick={() => setPriority(key)}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                    priority === p
-                      ? p === "Urgent"
+                    priority === key
+                      ? key === "Urgent"
                         ? "bg-red-50 border-red-500 text-red-700"
-                        : p === "High"
+                        : key === "High"
                           ? "bg-amber-50 border-amber-500 text-amber-700"
                           : "bg-neutral-900 border-neutral-900 text-white"
                       : "bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50"
                   }`}
                 >
-                  {p}
+                  {label}
                 </button>
               ))}
             </div>
@@ -344,7 +349,7 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
                 disabled={saving}
                 className="text-xs font-semibold text-red-600 hover:text-red-800 disabled:opacity-50 transition-colors cursor-pointer"
               >
-                Unassign Task
+                {t("assign_modal.unassign")}
               </button>
             )}
           </div>
@@ -355,7 +360,7 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
               disabled={saving}
               className="px-4 py-2 text-sm font-medium rounded-xl border border-line bg-white hover:bg-neutral-50 text-neutral-700 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("assign_modal.cancel")}
             </button>
             <button
               type="button"
@@ -363,7 +368,7 @@ function AssignTaskModal({ booking, isOpen, onClose, onSaved }) {
               disabled={saving}
               className="px-5 py-2 text-sm font-semibold rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white shadow-sm transition-colors cursor-pointer disabled:opacity-50"
             >
-              {saving ? "Saving..." : "Save Assignment"}
+              {saving ? t("assign_modal.saving") : t("assign_modal.save")}
             </button>
           </div>
         </div>

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { money, formatDate, downloadCSV } from "../utils/format";
 
 function Payments() {
+  const { t } = useTranslation();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,10 +83,10 @@ function Payments() {
 
   return (
     <>
-      <PageHeader title="Payments" sub="Income received from bookings" />
+      <PageHeader title={t("payments.title")} sub={t("payments.sub")} />
 
       {loading ? (
-        <div className="p-8 text-center text-muted">Loading payments...</div>
+        <div className="p-8 text-center text-muted">{t("payments.loading")}</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -97,7 +99,7 @@ function Payments() {
               onClick={() => setMethodFilter("all")}
               title="Click to view all payments"
             >
-              <div className="text-muted text-sm mb-3">Total income</div>
+              <div className="text-muted text-sm mb-3">{t("payments.total_income")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(totalIncome)}
               </div>
@@ -111,7 +113,7 @@ function Payments() {
               onClick={() => setMethodFilter("Cash")}
               title="Click to filter by Cash payments"
             >
-              <div className="text-muted text-sm mb-3">Cash</div>
+              <div className="text-muted text-sm mb-3">{t("payments.cash")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(cashTotal)}
               </div>
@@ -125,7 +127,7 @@ function Payments() {
               onClick={() => setMethodFilter("Transfer")}
               title="Click to filter by Transfer payments"
             >
-              <div className="text-muted text-sm mb-3">Transfer</div>
+              <div className="text-muted text-sm mb-3">{t("payments.transfer")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(transferTotal)}
               </div>
@@ -133,8 +135,10 @@ function Payments() {
             <div className="card-panel p-5">
               <div className="text-muted text-sm mb-3">
                 {methodFilter !== "all"
-                  ? `${methodFilter} Payments`
-                  : "Total Payments"}
+                  ? methodFilter === "Cash"
+                    ? t("payments.cash_payments")
+                    : t("payments.transfer_payments")
+                  : t("payments.total_payments")}
               </div>
               <div className="text-3xl font-bold tracking-tight">
                 {filteredPayments.length}
@@ -169,44 +173,44 @@ function Payments() {
                   className={getMethodBtnClass("all")}
                   onClick={() => setMethodFilter("all")}
                 >
-                  All
+                  {t("payments.filter_all")}
                 </button>
                 <button
                   type="button"
                   className={getMethodBtnClass("Cash")}
                   onClick={() => setMethodFilter("Cash")}
                 >
-                  Cash
+                  {t("payments.cash")}
                 </button>
                 <button
                   type="button"
                   className={getMethodBtnClass("Transfer")}
                   onClick={() => setMethodFilter("Transfer")}
                 >
-                  Transfer
+                  {t("payments.transfer")}
                 </button>
               </div>
             </div>
 
             <div className="flex gap-2 shrink-0">
               <button className="btn-secondary" onClick={handleExport}>
-                Export CSV
+                {t("payments.export_csv")}
               </button>
             </div>
           </div>
 
           <div className="card-panel overflow-hidden">
             <div className="grid grid-cols-[1.5fr_1.5fr_1fr_1fr] md:grid-cols-[1.5fr_1.5fr_1fr_1fr_1fr] items-center text-muted text-xs uppercase tracking-wider font-semibold py-3 px-5 border-b border-line bg-neutral-50">
-              <div>Customer</div>
-              <div>Service</div>
-              <div className="hidden md:block">Method</div>
-              <div>Date</div>
-              <div className="text-right">Amount</div>
+              <div>{t("payments.col_customer")}</div>
+              <div>{t("payments.col_service")}</div>
+              <div className="hidden md:block">{t("payments.col_method")}</div>
+              <div>{t("payments.col_date")}</div>
+              <div className="text-right">{t("payments.col_amount")}</div>
             </div>
 
             {filteredPayments.length === 0 ? (
               <div className="p-8 text-center text-muted">
-                No payments found matching the selected filters.
+                {t("payments.no_payments")}
               </div>
             ) : (
               filteredPayments.map((x) => (
@@ -216,7 +220,7 @@ function Payments() {
                 >
                   <div>
                     <b className="text-base text-text">
-                      {x.name || "Walk-in Customer"}
+                      {x.name || t("bookings.walk_in_customer")}
                     </b>
                   </div>
                   <div className="text-muted">

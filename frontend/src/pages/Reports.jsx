@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { money, formatDate, downloadCSV } from "../utils/format";
 import {
@@ -12,6 +13,7 @@ import {
 } from "recharts";
 
 function Reports() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -72,7 +74,7 @@ function Reports() {
     if (period === "all" || percent === 0)
       return (
         <div className="text-neutral-400 text-xs mt-2 font-medium">
-          No change
+          {t("reports.no_change")}
         </div>
       );
     const isPositive = percent > 0;
@@ -80,7 +82,7 @@ function Reports() {
       <div
         className={`${isPositive ? "text-green-700" : "text-red-600"} text-xs mt-2 font-medium`}
       >
-        {isPositive ? "↑" : "↓"} {Math.abs(percent)}% vs previous
+        {isPositive ? "↑" : "↓"} {Math.abs(percent)}% {t("reports.vs_previous")}
       </div>
     );
   };
@@ -88,9 +90,8 @@ function Reports() {
   return (
     <>
       <PageHeader
-        title="Reports"
-        sub="Track your performance"
-       
+        title={t("reports.title")}
+        sub={t("reports.sub")}
       />
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -100,31 +101,31 @@ function Reports() {
               className={getBtnClass("today")}
               onClick={() => setPeriod("today")}
             >
-              Today
+              {t("reports.today")}
             </button>
             <button
               className={getBtnClass("week")}
               onClick={() => setPeriod("week")}
             >
-              This Week
+              {t("reports.week")}
             </button>
             <button
               className={getBtnClass("month")}
               onClick={() => setPeriod("month")}
             >
-              This Month
+              {t("reports.month")}
             </button>
             <button
               className={getBtnClass("all")}
               onClick={() => setPeriod("all")}
             >
-              All Time
+              {t("reports.all_time")}
             </button>
             <button
               className={getBtnClass("custom")}
               onClick={() => setPeriod("custom")}
             >
-              Custom
+              {t("reports.custom")}
             </button>
           </div>
 
@@ -158,44 +159,44 @@ function Reports() {
             onClick={handleExport}
             disabled={!reports}
           >
-            Export CSV
+            {t("reports.export_csv")}
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-muted">Loading reports...</div>
+        <div className="p-8 text-center text-muted">{t("reports.loading")}</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Revenue</div>
+              <div className="text-muted text-sm mb-3">{t("reports.revenue")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(reports?.revenue || 0)}
               </div>
               {renderChange(reports?.changes?.revenue)}
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Expenses</div>
+              <div className="text-muted text-sm mb-3">{t("reports.expenses")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(reports?.expenses || 0)}
               </div>
               {renderChange(reports?.changes?.expenses)}
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Net profit</div>
+              <div className="text-muted text-sm mb-3">{t("reports.net_profit")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(reports?.profit || 0)}
               </div>
               {renderChange(reports?.changes?.profit)}
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Bookings</div>
+              <div className="text-muted text-sm mb-3">{t("reports.total_bookings")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {reports?.bookings || 0}
               </div>
               <div className="text-muted text-xs mt-2">
-                {reports?.completed || 0} completed
+                {reports?.completed || 0} {t("reports.completed")}
               </div>
             </div>
           </div>
@@ -203,7 +204,7 @@ function Reports() {
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-5">
             <div className="card-panel p-6">
               <h3 className="font-semibold text-lg mb-6">
-                Revenue vs Expenses
+                {t("reports.rev_vs_exp")}
               </h3>
               <div className="h-[300px] w-full">
                 {reports?.timeline?.length > 0 ? (
@@ -281,7 +282,7 @@ function Reports() {
                       />
                       <Area
                         type="monotone"
-                        name="Revenue"
+                        name={t("reports.revenue")}
                         dataKey="revenue"
                         stroke="#10b981"
                         strokeWidth={2}
@@ -290,7 +291,7 @@ function Reports() {
                       />
                       <Area
                         type="monotone"
-                        name="Expenses"
+                        name={t("reports.expenses")}
                         dataKey="expenses"
                         stroke="#ef4444"
                         strokeWidth={2}
@@ -301,35 +302,35 @@ function Reports() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted">
-                    No data available for this period.
+                    {t("reports.no_timeline")}
                   </div>
                 )}
               </div>
             </div>
 
             <div className="card-panel p-6">
-              <h3 className="font-semibold text-lg mb-6">Summary</h3>
+              <h3 className="font-semibold text-lg mb-6">{t("reports.summary")}</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-line">
-                  <span className="text-muted text-sm">Gross Revenue</span>
+                  <span className="text-muted text-sm">{t("reports.gross_revenue")}</span>
                   <span className="font-semibold">
                     {money(reports?.revenue || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-line">
-                  <span className="text-muted text-sm">Total Expenses</span>
+                  <span className="text-muted text-sm">{t("reports.expenses")}</span>
                   <span className="font-semibold text-red-600">
                     -{money(reports?.expenses || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-line">
-                  <span className="text-muted text-sm">Net Profit</span>
+                  <span className="text-muted text-sm">{t("reports.net_profit")}</span>
                   <span className="font-bold text-green-700">
                     {money(reports?.profit || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-muted text-sm">Profit Margin</span>
+                  <span className="text-muted text-sm">{t("reports.profit_margin")}</span>
                   <span className="font-semibold text-neutral-800">
                     {reports?.revenue > 0
                       ? Math.round((reports.profit / reports.revenue) * 100)

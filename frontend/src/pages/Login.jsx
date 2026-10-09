@@ -1,13 +1,24 @@
 import { useState, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
 
 function Login() {
+  const { t, i18n } = useTranslation();
   const { login } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const currentLang = (i18n.language || "en").toLowerCase().startsWith("am")
+    ? "am"
+    : "en";
+
+  const toggleLanguage = () => {
+    const nextLang = currentLang === "en" ? "am" : "en";
+    i18n.changeLanguage(nextLang);
+  };
 
   // Use .env configured name, fallback to "service."
   const companyName = import.meta.env.VITE_COMPANY_NAME || "service.";
@@ -25,7 +36,18 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <button
+          type="button"
+          onClick={toggleLanguage}
+          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-line bg-white hover:bg-neutral-50 text-neutral-800 transition-colors cursor-pointer shadow-sm"
+          title="Switch language / ቋንቋ ቀይር"
+        >
+          {currentLang === "en" ? "አማርኛ" : "English"}
+        </button>
+      </div>
+
       <div className="card-panel p-8 w-full max-w-sm">
         <div className="text-center mb-8 flex flex-col items-center">
           <img
@@ -36,7 +58,7 @@ function Login() {
           <div className="text-2xl font-bold text-text tracking-tight mb-2 truncate w-full">
             {companyName}
           </div>
-          <p className="text-muted text-sm">Sign in to your account</p>
+          <p className="text-muted text-sm">{t("login.sub")}</p>
         </div>
 
         {error && (
@@ -48,7 +70,7 @@ function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-medium mb-1.5 text-text">
-              Username
+              {t("login.username")}
             </label>
             <input
               type="text"
@@ -60,7 +82,7 @@ function Login() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1.5 text-text">
-              Password
+              {t("login.password")}
             </label>
             <div className="relative">
               <input
@@ -109,7 +131,7 @@ function Login() {
             </div>
           </div>
           <button type="submit" className="btn mt-2" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? t("login.signing_in") : t("login.signin_btn")}
           </button>
         </form>
       </div>

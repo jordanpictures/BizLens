@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 function RewardModal({
   isOpen,
@@ -8,6 +9,7 @@ function RewardModal({
   preselectedUserId = null,
   defaultTaskTitle = "",
 }) {
+  const { t } = useTranslation();
   const [members, setMembers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [userId, setUserId] = useState(preselectedUserId || "");
@@ -97,10 +99,10 @@ function RewardModal({
         <div className="px-6 py-5 border-b border-line flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-neutral-900 m-0">
-              Reward Team Member
+              {t("reward_modal.title")}
             </h3>
             <p className="text-xs text-neutral-500 m-0 mt-0.5">
-              Add a reward or allowance to team member wallet balance
+              {t("reward_modal.sub")}
             </p>
           </div>
           <button
@@ -134,7 +136,7 @@ function RewardModal({
           {/* Member Selection */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Team Member *
+              {t("reward_modal.member_label")}
             </label>
             <select
               value={userId}
@@ -142,7 +144,7 @@ function RewardModal({
               className="w-full p-2.5 text-sm bg-white border border-line rounded-xl focus:outline-hidden focus:border-neutral-900 transition-colors"
               required
             >
-              <option value="">Select team member...</option>
+              <option value="">{t("reward_modal.select_member")}</option>
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.username} {m.position ? `(${m.position})` : `(${m.role})`}
@@ -154,7 +156,7 @@ function RewardModal({
           {/* Task Reference (Optional) */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Associated Task (Optional)
+              {t("reward_modal.task_label")}
             </label>
             {preselectedTaskId ? (
               <div className="p-2.5 bg-neutral-50 rounded-xl border border-line text-xs font-medium text-neutral-800">
@@ -166,13 +168,13 @@ function RewardModal({
                 onChange={(e) => setTaskId(e.target.value)}
                 className="w-full p-2.5 text-sm bg-white border border-line rounded-xl focus:outline-hidden focus:border-neutral-900 transition-colors"
               >
-                <option value="">General / None</option>
-                {tasks.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.customer_name
-                      ? `${t.service_type} - ${t.customer_name}`
-                      : `${t.service_type} Task`}{" "}
-                    ({t.status})
+                <option value="">{t("reward_modal.general")}</option>
+                {tasks.map((task) => (
+                  <option key={task.id} value={task.id}>
+                    {task.customer_name
+                      ? `${task.service_type} - ${task.customer_name}`
+                      : `${task.service_type} Task`}{" "}
+                    ({task.status})
                   </option>
                 ))}
               </select>
@@ -182,7 +184,7 @@ function RewardModal({
           {/* Reward Amount */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Reward Amount (ETB) *
+              {t("reward_modal.amount_label")}
             </label>
             <input
               type="number"
@@ -199,11 +201,11 @@ function RewardModal({
           {/* Notes / Description */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Note / Nature of Reward
+              {t("reward_modal.notes_label")}
             </label>
             <input
               type="text"
-              placeholder="e.g. Shoot allowance, Client tip, Performance bonus"
+              placeholder={t("reward_modal.notes_placeholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full p-2.5 text-sm bg-white border border-line rounded-xl focus:outline-hidden focus:border-neutral-900 transition-colors"
@@ -213,7 +215,7 @@ function RewardModal({
           {/* Total Preview */}
           <div className="p-3 bg-neutral-50 rounded-xl border border-line flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
-              Total Added to Balance:
+              {t("reward_modal.total_added")}
             </span>
             <span className="text-base font-bold text-neutral-900">
               ETB{" "}
@@ -232,14 +234,16 @@ function RewardModal({
               disabled={saving}
               className="btn-secondary flex-1 py-2 text-xs cursor-pointer"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={saving || parsedAmount <= 0}
               className="btn flex-1 py-2 text-xs disabled:opacity-50 cursor-pointer"
             >
-              {saving ? "Rewarding..." : "Confirm & Reward"}
+              {saving
+                ? t("reward_modal.submitting")
+                : t("reward_modal.confirm_btn")}
             </button>
           </div>
         </form>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { money } from "../utils/format";
 
 function Users() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -140,26 +142,26 @@ function Users() {
   };
 
   if (loading)
-    return <div className="p-8 text-center text-muted">Loading users...</div>;
+    return <div className="p-8 text-center text-muted">{t("users.loading")}</div>;
 
   return (
     <>
-      <PageHeader title="Users" sub="Manage system access and roles" />
+      <PageHeader title={t("users.title")} sub={t("users.sub")} />
 
       <div className="card-panel p-6 mb-8">
-        <h3 className="font-semibold text-lg mb-4">Add New User</h3>
+        <h3 className="font-semibold text-lg mb-4">{t("users.add_title")}</h3>
         <div className="flex flex-wrap gap-3">
           <input
             type="text"
             className="input-field flex-1 min-w-[140px]"
-            placeholder="Username"
+            placeholder={t("users.username_ph")}
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
           />
           <input
             type="password"
             className="input-field flex-1 min-w-[140px]"
-            placeholder="Password"
+            placeholder={t("users.password_ph")}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
@@ -168,14 +170,14 @@ function Users() {
             value={newRole}
             onChange={(e) => setNewRole(e.target.value)}
           >
-            <option value="Receptionist">Receptionist</option>
-            <option value="Team Member">Team Member</option>
-            <option value="Owner">Owner</option>
+            <option value="Receptionist">{t("role.receptionist")}</option>
+            <option value="Team Member">{t("role.team_member")}</option>
+            <option value="Owner">{t("role.owner")}</option>
           </select>
           <input
             type="text"
             className="input-field flex-1 min-w-[140px]"
-            placeholder="Position"
+            placeholder={t("users.position_ph")}
             value={newPosition}
             onChange={(e) => setNewPosition(e.target.value)}
           />
@@ -183,29 +185,29 @@ function Users() {
             type="number"
             step="any"
             className="input-field w-[130px]"
-            placeholder="Salary (ETB)"
+            placeholder={t("users.salary_ph")}
             value={newSalary}
             onChange={(e) => setNewSalary(e.target.value)}
           />
           <button className="btn" onClick={handleCreate}>
-            Create User
+            {t("users.create_btn")}
           </button>
         </div>
       </div>
 
       <div className="card-panel overflow-hidden">
         <div className="px-6 py-5 border-b border-line bg-white">
-          <h3 className="text-lg font-semibold m-0">Active Users</h3>
+          <h3 className="text-lg font-semibold m-0">{t("users.active_title")}</h3>
         </div>
 
         <div className="overflow-x-auto">
           <div className="min-w-[800px] divide-y divide-line">
             <div className="grid grid-cols-[1.2fr_1fr_1.2fr_1fr_200px] text-xs uppercase tracking-wider text-muted font-semibold py-3 px-6 bg-neutral-50">
-              <div>Username</div>
-              <div>Role</div>
-              <div>Position</div>
-              <div>Salary</div>
-              <div className="text-right">Action</div>
+              <div>{t("users.col_username")}</div>
+              <div>{t("users.col_role")}</div>
+              <div>{t("users.col_position")}</div>
+              <div>{t("users.col_salary")}</div>
+              <div className="text-right">{t("users.col_action")}</div>
             </div>
 
             {users.map((u) => (
@@ -219,14 +221,14 @@ function Users() {
                     <input
                       type="text"
                       className="input-field flex-1 !py-1 min-w-[120px]"
-                      placeholder="Username"
+                      placeholder={t("users.username_ph")}
                       value={editUsername}
                       onChange={(e) => setEditUsername(e.target.value)}
                     />
                     <input
                       type="password"
                       className="input-field flex-1 !py-1 min-w-[130px]"
-                      placeholder="New Password (optional)"
+                      placeholder={t("users.new_password_ph")}
                       value={editPassword}
                       onChange={(e) => setEditPassword(e.target.value)}
                     />
@@ -235,14 +237,14 @@ function Users() {
                       value={editRole}
                       onChange={(e) => setEditRole(e.target.value)}
                     >
-                      <option value="Receptionist">Receptionist</option>
-                      <option value="Team Member">Team Member</option>
-                      <option value="Owner">Owner</option>
+                      <option value="Receptionist">{t("role.receptionist")}</option>
+                      <option value="Team Member">{t("role.team_member")}</option>
+                      <option value="Owner">{t("role.owner")}</option>
                     </select>
                     <input
                       type="text"
                       className="input-field flex-1 !py-1 min-w-[120px]"
-                      placeholder="Position"
+                      placeholder={t("users.position_ph")}
                       value={editPosition}
                       onChange={(e) => setEditPosition(e.target.value)}
                     />
@@ -250,19 +252,19 @@ function Users() {
                       type="number"
                       step="any"
                       className="input-field !py-1 w-[120px]"
-                      placeholder="Salary"
+                      placeholder={t("users.salary_ph")}
                       value={editSalary}
                       onChange={(e) => setEditSalary(e.target.value)}
                     />
                     <div className="flex gap-2">
                       <button className="btn !py-1" onClick={handleUpdate}>
-                        Save
+                        {t("users.save")}
                       </button>
                       <button
                         className="btn-secondary !py-1"
                         onClick={() => setEditingId(null)}
                       >
-                        Cancel
+                        {t("users.cancel")}
                       </button>
                     </div>
                   </div>
@@ -273,7 +275,7 @@ function Users() {
                       {u.username}
                       {!u.is_active && (
                         <span className="ml-2 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">
-                          Deactivated
+                          {t("users.deactivated_badge")}
                         </span>
                       )}
                     </div>
@@ -287,7 +289,11 @@ function Users() {
                               : "bg-neutral-100 text-neutral-700"
                         }`}
                       >
-                        {u.role}
+                        {u.role === "Owner"
+                          ? t("role.owner")
+                          : u.role === "Team Member"
+                            ? t("role.team_member")
+                            : t("role.receptionist")}
                       </span>
                     </div>
                     <div className="text-sm text-neutral-600">
@@ -303,7 +309,7 @@ function Users() {
                         className="text-neutral-500 hover:text-neutral-900 text-sm font-medium transition-colors"
                         onClick={() => startEdit(u)}
                       >
-                        Edit
+                        {t("users.edit")}
                       </button>
                       <button
                         className={`${
@@ -313,13 +319,13 @@ function Users() {
                         } text-sm font-medium transition-colors`}
                         onClick={() => handleToggleActive(u.id, !u.is_active)}
                       >
-                        {u.is_active ? "Deactivate" : "Activate"}
+                        {u.is_active ? t("users.deactivate") : t("users.activate")}
                       </button>
                       <button
                         className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
                         onClick={() => handleDelete(u.id)}
                       >
-                        Remove
+                        {t("users.remove")}
                       </button>
                     </div>
                   </div>
@@ -328,7 +334,7 @@ function Users() {
             ))}
             {users.length === 0 && (
               <div className="py-6 text-muted text-sm text-center">
-                No users found.
+                {t("users.no_users")}
               </div>
             )}
           </div>

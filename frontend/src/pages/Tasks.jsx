@@ -1,10 +1,12 @@
 import { useState, useEffect, useContext, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { AuthContext } from "../context/AuthContext";
 import { formatDate, formatDuration } from "../utils/format";
 
 function Tasks() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [tasks, setTasks] = useState([]);
@@ -45,7 +47,9 @@ function Tasks() {
       });
       if (res.ok) {
         setTasks((prev) =>
-          prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)),
+          prev.map((item) =>
+            item.id === taskId ? { ...item, status: newStatus } : item,
+          ),
         );
       } else {
         const err = await res.json();
@@ -62,8 +66,8 @@ function Tasks() {
   // Distinct assignees list for owner filter
   const allAssignees = useMemo(() => {
     const map = new Map();
-    tasks.forEach((t) => {
-      (t.assignees || []).forEach((a) => {
+    tasks.forEach((task) => {
+      (task.assignees || []).forEach((a) => {
         if (!map.has(a.id)) {
           map.set(a.id, a);
         }
@@ -78,21 +82,21 @@ function Tasks() {
   const counts = useMemo(() => {
     return {
       all: tasks.length,
-      pending: tasks.filter((t) => t.status === "Pending").length,
-      in_progress: tasks.filter((t) => t.status === "In Progress").length,
-      completed: tasks.filter((t) => t.status === "Completed").length,
+      pending: tasks.filter((task) => task.status === "Pending").length,
+      in_progress: tasks.filter((task) => task.status === "In Progress").length,
+      completed: tasks.filter((task) => task.status === "Completed").length,
     };
   }, [tasks]);
 
   // Filtered tasks
   const filteredTasks = useMemo(() => {
-    return tasks.filter((t) => {
+    return tasks.filter((task) => {
       // Status filter
-      if (statusFilter !== "all" && t.status !== statusFilter) return false;
+      if (statusFilter !== "all" && task.status !== statusFilter) return false;
 
       // Assignee filter
       if (assigneeFilter !== "all") {
-        const hasAssignee = (t.assignees || []).some(
+        const hasAssignee = (task.assignees || []).some(
           (a) => a.id === assigneeFilter,
         );
         if (!hasAssignee) return false;
@@ -101,11 +105,11 @@ function Tasks() {
       // Search query
       if (search.trim()) {
         const q = search.toLowerCase();
-        const matchesTitle = t.title?.toLowerCase().includes(q);
-        const matchesCustomer = t.customer_name?.toLowerCase().includes(q);
-        const matchesService = t.service_type?.toLowerCase().includes(q);
-        const matchesNotes = t.notes?.toLowerCase().includes(q);
-        const matchesAssignee = (t.assignees || []).some((a) =>
+        const matchesTitle = task.title?.toLowerCase().includes(q);
+        const matchesCustomer = task.customer_name?.toLowerCase().includes(q);
+        const matchesService = task.service_type?.toLowerCase().includes(q);
+        const matchesNotes = task.notes?.toLowerCase().includes(q);
+        const matchesAssignee = (task.assignees || []).some((a) =>
           a.username.toLowerCase().includes(q),
         );
         if (
@@ -122,6 +126,20 @@ function Tasks() {
       return true;
     });
   }, [tasks, statusFilter, assigneeFilter, search]);
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "In Progress":
+        return t("status.in_progress");
+      case "Completed":
+        return t("status.completed");
+      case "Cancelled":
+        return t("status.cancelled");
+      case "Pending":
+      default:
+        return t("status.pending");
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -152,19 +170,15 @@ function Tasks() {
   return (
     <>
       <PageHeader
-        title="Tasks"
-        sub={
-          isOwner
-            ? "Manage workflow assignments, assignees, and project progress"
-            : "Your assigned tasks and client service instructions"
-        }
+        title={t("tasks.title")}
+        sub={isOwner ? t("tasks.sub_owner") : t("tasks.sub_member")}
       />
 
       {/* KPI Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-xl border border-line shadow-xs">
           <div className="text-xs font-semibold text-muted uppercase tracking-wider">
-            Total Tasks
+            {t("tasks.total")}
           </div>
           <div className="text-2xl font-bold text-neutral-900 mt-1">
             {counts.all}
@@ -173,7 +187,7 @@ function Tasks() {
 
         <div className="bg-white p-4 rounded-xl border border-line shadow-xs">
           <div className="text-xs font-semibold text-amber-600 uppercase tracking-wider">
-            Pending / To Do
+            {t("tasks.to_do")}
           </div>
           <div className="text-2xl font-bold text-amber-600 mt-1">
             {counts.pending}
@@ -182,7 +196,7 @@ function Tasks() {
 
         <div className="bg-white p-4 rounded-xl border border-line shadow-xs">
           <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
-            In Progress
+            {t("tasks.in_progress")}
           </div>
           <div className="text-2xl font-bold text-blue-600 mt-1">
             {counts.in_progress}
@@ -191,7 +205,7 @@ function Tasks() {
 
         <div className="bg-white p-4 rounded-xl border border-line shadow-xs">
           <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
-            Completed
+            {t("tasks.completed")}
           </div>
           <div className="text-2xl font-bold text-emerald-600 mt-1">
             {counts.completed}
@@ -205,14 +219,22 @@ function Tasks() {
           {/* Status Tabs */}
           <div className="flex flex-wrap gap-1.5">
             {[
-              { key: "all", label: "All Tasks", count: counts.all },
-              { key: "Pending", label: "Pending", count: counts.pending },
+              { key: "all", label: t("tasks.filter_all"), count: counts.all },
+              {
+                key: "Pending",
+                label: t("status.pending"),
+                count: counts.pending,
+              },
               {
                 key: "In Progress",
-                label: "In Progress",
+                label: t("status.in_progress"),
                 count: counts.in_progress,
               },
-              { key: "Completed", label: "Completed", count: counts.completed },
+              {
+                key: "Completed",
+                label: t("status.completed"),
+                count: counts.completed,
+              },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -246,7 +268,7 @@ function Tasks() {
                 value={assigneeFilter}
                 onChange={(e) => setAssigneeFilter(e.target.value)}
               >
-                <option value="all">All Assignees</option>
+                <option value="all">{t("tasks.assignee_filter")}</option>
                 {allAssignees.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.username} {a.position ? `(${a.position})` : ""}
@@ -258,7 +280,7 @@ function Tasks() {
             <input
               type="text"
               className="input-field text-xs !py-1.5 !px-3 min-w-[200px]"
-              placeholder="Search tasks, client, service..."
+              placeholder={t("tasks.search_placeholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -268,7 +290,9 @@ function Tasks() {
         {/* Task Cards Grid */}
         <div className="p-4 sm:p-6 bg-neutral-50/30">
           {loading ? (
-            <div className="py-16 text-center text-muted">Loading tasks...</div>
+            <div className="py-16 text-center text-muted">
+              {t("common.loading")}
+            </div>
           ) : filteredTasks.length === 0 ? (
             <div className="py-16 text-center">
               <div className="w-12 h-12 rounded-full bg-neutral-100 text-neutral-400 flex items-center justify-center mx-auto mb-3">
@@ -287,12 +311,12 @@ function Tasks() {
                 </svg>
               </div>
               <h4 className="text-base font-semibold text-neutral-800 m-0">
-                No tasks found
+                {t("tasks.no_tasks")}
               </h4>
               <p className="text-xs text-muted mt-1 max-w-sm mx-auto">
                 {isOwner
-                  ? "Assign tasks to team members directly from the Bookings page."
-                  : "You currently have no tasks matching this filter."}
+                  ? t("tasks.no_tasks_owner_sub")
+                  : t("tasks.no_tasks_member_sub")}
               </p>
               {isOwner && (
                 <button
@@ -300,22 +324,22 @@ function Tasks() {
                   onClick={() => navigate("/bookings")}
                   className="btn text-xs !py-1.5 !px-4 mt-4"
                 >
-                  Go to Bookings
+                  {t("tasks.go_to_bookings")}
                 </button>
               )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredTasks.map((t) => {
-                const assignees = t.assignees || [];
+              {filteredTasks.map((task) => {
+                const assignees = task.assignees || [];
                 const canShowCustomer =
-                  isOwner || Boolean(t.show_customer_info);
+                  isOwner || Boolean(task.show_customer_info);
                 const displayTitle = canShowCustomer
-                  ? t.customer_name?.trim() || "Walk-in Customer"
-                  : `${t.service_type} Task`;
+                  ? task.customer_name?.trim() || t("tasks.walk_in")
+                  : `${task.service_type} Task`;
                 return (
                   <div
-                    key={t.id}
+                    key={task.id}
                     className="bg-white rounded-2xl border border-neutral-200/90 hover:border-neutral-400/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)] transition-all duration-200 p-5 flex flex-col justify-between group"
                   >
                     <div>
@@ -323,33 +347,33 @@ function Tasks() {
                       <div className="flex items-center justify-between gap-2 mb-3.5">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-neutral-100 text-neutral-800 border border-neutral-200/60">
                           <span className="w-1.5 h-1.5 rounded-full bg-neutral-900"></span>
-                          {t.service_type}
+                          {task.service_type}
                         </span>
 
                         <div className="flex items-center gap-1.5">
-                          {t.priority && t.priority !== "Normal" && (
+                          {task.priority && task.priority !== "Normal" && (
                             <span
                               className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                                t.priority === "Urgent"
+                                task.priority === "Urgent"
                                   ? "bg-red-50 text-red-700 border border-red-200"
                                   : "bg-amber-50 text-amber-700 border border-amber-200"
                               }`}
                             >
-                              {t.priority}
+                              {task.priority}
                             </span>
                           )}
 
                           <span
                             className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${getStatusBadge(
-                              t.status,
+                              task.status,
                             )}`}
                           >
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${getStatusDot(
-                                t.status,
+                                task.status,
                               )}`}
                             ></span>
-                            {t.status}
+                            {getStatusText(task.status)}
                           </span>
                         </div>
                       </div>
@@ -357,11 +381,11 @@ function Tasks() {
                       {/* Title & Customer Contact */}
                       <div className="mb-4">
                         <h4 className="text-base font-bold text-neutral-900 m-0 group-hover:text-neutral-700 transition-colors leading-snug">
-                          <Link to={`/tasks/${t.id}`}>{displayTitle}</Link>
+                          <Link to={`/tasks/${task.id}`}>{displayTitle}</Link>
                         </h4>
-                        {canShowCustomer && t.customer_phone && (
+                        {canShowCustomer && task.customer_phone && (
                           <a
-                            href={`tel:${t.customer_phone}`}
+                            href={`tel:${task.customer_phone}`}
                             className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 font-medium transition-colors mt-1"
                           >
                             <svg
@@ -376,7 +400,7 @@ function Tasks() {
                             >
                               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                             </svg>
-                            <span>{t.customer_phone}</span>
+                            <span>{task.customer_phone}</span>
                           </a>
                         )}
                       </div>
@@ -384,7 +408,7 @@ function Tasks() {
                       {/* Modular Meta Info Panel */}
                       <div className="bg-neutral-50/80 rounded-xl p-3 border border-neutral-200/60 space-y-2 mb-3.5">
                         {/* Schedule: Start Time & Duration (No End Time) */}
-                        {t.start_time && (
+                        {task.start_time && (
                           <div className="flex items-center justify-between text-xs gap-2">
                             <div className="flex items-center gap-1.5 text-neutral-400 font-medium">
                               <svg
@@ -401,14 +425,17 @@ function Tasks() {
                                 <polyline points="12 6 12 12 16 14"></polyline>
                               </svg>
                               <span className="text-[11px] uppercase tracking-wider font-semibold">
-                                Schedule
+                                {t("tasks.schedule")}
                               </span>
                             </div>
                             <div className="font-semibold text-neutral-800 text-right">
-                              <span>{formatDate(t.start_time, true)}</span>
-                              {t.end_time && (
+                              <span>{formatDate(task.start_time, true)}</span>
+                              {task.end_time && (
                                 <span className="ml-1.5 px-1.5 py-0.5 rounded bg-neutral-200/80 text-[10px] font-semibold text-neutral-800">
-                                  {formatDuration(t.start_time, t.end_time)}
+                                  {formatDuration(
+                                    task.start_time,
+                                    task.end_time,
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -416,7 +443,7 @@ function Tasks() {
                         )}
 
                         {/* Due Date */}
-                        {t.due_date && (
+                        {task.due_date && (
                           <div className="flex items-center justify-between text-xs gap-2">
                             <div className="flex items-center gap-1.5 text-neutral-400 font-medium">
                               <svg
@@ -442,17 +469,17 @@ function Tasks() {
                                 <line x1="3" y1="10" x2="21" y2="10"></line>
                               </svg>
                               <span className="text-[11px] uppercase tracking-wider font-semibold">
-                                Due Date
+                                {t("tasks.due_date")}
                               </span>
                             </div>
                             <span className="font-semibold text-neutral-800">
-                              {formatDate(t.due_date)}
+                              {formatDate(task.due_date)}
                             </span>
                           </div>
                         )}
 
                         {/* Package Info */}
-                        {t.package && (
+                        {task.package && (
                           <div className="flex items-center justify-between text-xs gap-2">
                             <div className="flex items-center gap-1.5 text-neutral-400 font-medium">
                               <svg
@@ -470,19 +497,19 @@ function Tasks() {
                                 <polyline points="2 12 12 17 22 12"></polyline>
                               </svg>
                               <span className="text-[11px] uppercase tracking-wider font-semibold">
-                                Package
+                                {t("tasks.package")}
                               </span>
                             </div>
                             <span className="font-medium text-neutral-800 truncate max-w-[150px]">
-                              {t.package}
-                              {t.quantity > 1 ? ` (×${t.quantity})` : ""}
+                              {task.package}
+                              {task.quantity > 1 ? ` (×${task.quantity})` : ""}
                             </span>
                           </div>
                         )}
                       </div>
 
                       {/* Assignment Notes */}
-                      {t.notes ? (
+                      {task.notes ? (
                         <div className="p-3 bg-neutral-50/70 rounded-xl border border-neutral-200/60 mb-2">
                           <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1">
                             <svg
@@ -500,15 +527,15 @@ function Tasks() {
                               <line x1="16" y1="13" x2="8" y2="13"></line>
                               <line x1="16" y1="17" x2="8" y2="17"></line>
                             </svg>
-                            <span>Instructions</span>
+                            <span>{t("tasks.instructions")}</span>
                           </div>
                           <p className="line-clamp-2 m-0 text-xs text-neutral-700 leading-relaxed font-normal">
-                            {t.notes}
+                            {task.notes}
                           </p>
                         </div>
                       ) : (
                         <div className="text-[11px] text-neutral-400 italic mb-2">
-                          No instructions entered.
+                          {t("tasks.no_instructions")}
                         </div>
                       )}
                     </div>
@@ -538,7 +565,7 @@ function Tasks() {
                               <span className="w-6 h-6 rounded-full border border-dashed border-neutral-300 flex items-center justify-center text-[10px] text-neutral-400 shrink-0">
                                 —
                               </span>
-                              <span>Unassigned</span>
+                              <span>{t("tasks.unassigned")}</span>
                             </div>
                           )}
                         </div>
@@ -546,17 +573,25 @@ function Tasks() {
                         {/* Quick Status Selector with Custom Caret */}
                         <div className="relative shrink-0">
                           <select
-                            disabled={updatingId === t.id}
+                            disabled={updatingId === task.id}
                             className="appearance-none text-xs font-semibold bg-white border border-neutral-200 hover:border-neutral-400 rounded-lg pl-3 pr-7 py-1.5 text-neutral-800 cursor-pointer shadow-2xs transition-colors focus:outline-hidden"
-                            value={t.status}
+                            value={task.status}
                             onChange={(e) =>
-                              handleStatusChange(t.id, e.target.value)
+                              handleStatusChange(task.id, e.target.value)
                             }
                           >
-                            <option value="Pending">Pending</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="Pending">
+                              {t("status.pending")}
+                            </option>
+                            <option value="In Progress">
+                              {t("status.in_progress")}
+                            </option>
+                            <option value="Completed">
+                              {t("status.completed")}
+                            </option>
+                            <option value="Cancelled">
+                              {t("status.cancelled")}
+                            </option>
                           </select>
                           <svg
                             className="w-3.5 h-3.5 text-neutral-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -572,10 +607,10 @@ function Tasks() {
 
                       {/* Full width Details Link */}
                       <Link
-                        to={`/tasks/${t.id}`}
+                        to={`/tasks/${task.id}`}
                         className="w-full py-2 px-3 text-center text-xs font-semibold text-neutral-700 hover:text-neutral-900 bg-neutral-100/70 hover:bg-neutral-200/80 rounded-xl transition-all flex items-center justify-center gap-1.5"
                       >
-                        <span>View Task Details</span>
+                        <span>{t("tasks.view_details")}</span>
                         <span className="text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-all">
                           →
                         </span>

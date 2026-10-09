@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import AssignTaskModal from "../components/AssignTaskModal";
 import RewardModal from "../components/RewardModal";
@@ -7,6 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 import { formatDate, formatDuration, money } from "../utils/format";
 
 function TaskDetails() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -142,7 +144,7 @@ function TaskDetails() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-muted">Loading task details...</div>
+      <div className="p-12 text-center text-muted">{t("common.loading")}</div>
     );
   }
 
@@ -154,13 +156,27 @@ function TaskDetails() {
           {error || "Task not found"}
         </p>
         <Link to="/tasks" className="btn text-sm">
-          ← Back to Tasks
+          ← {t("task_details.back")}
         </Link>
       </div>
     );
   }
 
   const canShowCustomerInfo = isOwner || task.show_customer_info;
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "In Progress":
+        return t("status.in_progress");
+      case "Completed":
+        return t("status.completed");
+      case "Cancelled":
+        return t("status.cancelled");
+      case "Pending":
+      default:
+        return t("status.pending");
+    }
+  };
 
   return (
     <>
@@ -169,7 +185,7 @@ function TaskDetails() {
           to="/tasks"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
         >
-          ← Back to Tasks
+          ← {t("task_details.back")}
         </Link>
       </div>
 
@@ -184,7 +200,7 @@ function TaskDetails() {
                 task.status,
               )}`}
             >
-              {task.status}
+              {getStatusText(task.status)}
             </span>
             {task.priority && task.priority !== "Normal" && (
               <span
@@ -194,7 +210,7 @@ function TaskDetails() {
                     : "bg-amber-100 text-amber-700"
                 }`}
               >
-                {task.priority} Priority
+                {task.priority} {t("common.priority")}
               </span>
             )}
           </div>
@@ -212,7 +228,7 @@ function TaskDetails() {
         {/* Status Actions */}
         <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-xl border border-line shadow-xs">
           <span className="text-xs font-semibold text-neutral-500 px-2">
-            Status:
+            {t("common.status")}:
           </span>
           {["Pending", "In Progress", "Completed"].map((st) => (
             <button
@@ -226,7 +242,11 @@ function TaskDetails() {
                   : "bg-neutral-50 text-neutral-600 hover:bg-neutral-100"
               }`}
             >
-              {st}
+              {st === "Pending"
+                ? t("status.pending")
+                : st === "In Progress"
+                  ? t("status.in_progress")
+                  : t("status.completed")}
             </button>
           ))}
           {isOwner && (
@@ -235,7 +255,7 @@ function TaskDetails() {
               onClick={() => setEditModalOpen(true)}
               className="ml-2 px-3 py-1 text-xs font-semibold rounded-lg border border-line hover:bg-neutral-50 text-neutral-700 transition-colors cursor-pointer"
             >
-              Edit Assignment
+              {t("task_details.edit_assignment")}
             </button>
           )}
         </div>
@@ -248,11 +268,11 @@ function TaskDetails() {
           <div className="bg-white rounded-2xl border border-line p-6 shadow-xs">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-bold text-neutral-900 m-0">
-                Assignment Instructions & Notes
+                {t("task_details.instructions_title")}
               </h3>
               {task.created_by_username && (
                 <span className="text-xs text-neutral-400">
-                  Assigned by {task.created_by_username}
+                  {t("task_details.assigned_by")} {task.created_by_username}
                 </span>
               )}
             </div>
@@ -263,7 +283,7 @@ function TaskDetails() {
               </div>
             ) : (
               <p className="text-sm text-neutral-400 italic">
-                No specific notes were entered during assignment.
+                {t("tasks.no_instructions")}
               </p>
             )}
           </div>
@@ -272,14 +292,14 @@ function TaskDetails() {
           <div className="bg-white rounded-2xl border border-line p-6 shadow-xs">
             <div className="flex items-center justify-between mb-4 border-b border-line pb-3">
               <h3 className="text-base font-bold text-neutral-900 m-0">
-                Service Information
+                {t("task_details.service_info")}
               </h3>
               {isOwner && (
                 <Link
                   to={`/bookings/${task.booking_id}`}
                   className="text-xs font-semibold text-neutral-700 hover:text-neutral-900 hover:underline"
                 >
-                  View Full Booking →
+                  {t("task_details.view_booking")} →
                 </Link>
               )}
             </div>
@@ -289,7 +309,7 @@ function TaskDetails() {
               <div className="mb-4 pb-4 border-b border-line flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                    Customer
+                    {t("task_details.customer")}
                   </div>
                   <div className="font-bold text-neutral-900 text-base">
                     {task.customer_name}
@@ -323,21 +343,21 @@ function TaskDetails() {
             <div className="grid grid-cols-2 gap-y-4">
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Service Type
+                  {t("task_details.service_type")}
                 </div>
                 <div className="font-medium">{task.service_type}</div>
               </div>
 
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Package(s)
+                  {t("tasks.package")}
                 </div>
                 <div className="font-medium">{task.package || "None"}</div>
               </div>
 
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Start Time
+                  {t("task_details.start_time")}
                 </div>
                 <div className="font-medium">
                   {task.start_time
@@ -348,7 +368,7 @@ function TaskDetails() {
 
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Duration / End Time
+                  {t("task_details.duration")}
                 </div>
                 <div className="font-medium">
                   {task.end_time
@@ -359,14 +379,14 @@ function TaskDetails() {
 
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Quantity
+                  {t("task_details.quantity")}
                 </div>
                 <div className="font-medium">{task.quantity || 1}</div>
               </div>
 
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Due Date
+                  {t("tasks.due_date")}
                 </div>
                 <div className="font-medium text-text">
                   {task.due_date ? formatDate(task.due_date) : "Not specified"}
@@ -375,7 +395,7 @@ function TaskDetails() {
 
               <div className="col-span-2 mt-2">
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Booking Notes
+                  {t("task_details.booking_notes")}
                 </div>
                 <div className="text-sm bg-neutral-50 p-3 rounded-lg border border-neutral-100 min-h-[60px]">
                   {task.booking_notes || (
@@ -391,14 +411,14 @@ function TaskDetails() {
           {/* Activity Updates & Comments */}
           <div className="bg-white rounded-2xl border border-line p-6 shadow-xs">
             <h3 className="text-base font-bold text-neutral-900 mb-4 m-0">
-              Activity & Progress Updates
+              {t("task_details.activity_title")}
             </h3>
 
             {/* Comments List */}
             <div className="space-y-3 mb-5 max-h-72 overflow-y-auto">
               {!task.comments || task.comments.length === 0 ? (
                 <p className="text-xs text-neutral-400 italic">
-                  No activity updates posted yet.
+                  {t("task_details.no_activity")}
                 </p>
               ) : (
                 task.comments.map((c) => (
@@ -437,16 +457,16 @@ function TaskDetails() {
               <input
                 type="text"
                 className="input-field text-xs flex-1"
-                placeholder="Post a progress update or note (e.g. Shooting finished, editing begun)..."
+                placeholder={t("task_details.post_placeholder")}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
               <button
                 type="submit"
                 disabled={submittingComment || !newComment.trim()}
-                className="btn text-xs !py-2 !px-4 disabled:opacity-50"
+                className="btn text-xs !py-2 !px-4 disabled:opacity-50 cursor-pointer"
               >
-                {submittingComment ? "Posting..." : "Post Update"}
+                {submittingComment ? "Posting..." : t("task_details.post_update")}
               </button>
             </form>
           </div>
@@ -457,13 +477,13 @@ function TaskDetails() {
           {/* Assigned Team Members Card */}
           <div className="bg-white rounded-2xl border border-line p-6 shadow-xs">
             <h3 className="text-base font-bold text-neutral-900 mb-4 m-0">
-              Assigned Team
+              {t("task_details.assigned_team")}
             </h3>
 
             <div className="space-y-3">
               {!task.assignees || task.assignees.length === 0 ? (
                 <p className="text-xs text-neutral-400 italic">
-                  No team members currently assigned.
+                  {t("task_details.no_assignees")}
                 </p>
               ) : (
                 task.assignees.map((a) => (
@@ -498,7 +518,7 @@ function TaskDetails() {
                 onClick={() => setEditModalOpen(true)}
                 className="w-full mt-4 py-2 text-xs font-semibold rounded-xl border border-line bg-white hover:bg-neutral-50 text-neutral-800 transition-colors cursor-pointer"
               >
-                Manage Assignees & Notes
+                {t("task_details.manage_assignees")}
               </button>
             )}
           </div>
@@ -507,7 +527,7 @@ function TaskDetails() {
           <div className="bg-white rounded-2xl border border-line p-6 shadow-xs">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-bold text-neutral-900 m-0">
-                Task Rewards
+                {t("task_details.rewards_title")}
               </h3>
               {isOwner && (
                 <button
@@ -515,14 +535,14 @@ function TaskDetails() {
                   onClick={() => setRewardModalOpen(true)}
                   className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 transition-colors cursor-pointer shadow-xs"
                 >
-                  + Add Reward
+                  {t("task_details.add_reward")}
                 </button>
               )}
             </div>
 
             {rewards.length === 0 ? (
               <p className="text-xs text-neutral-400 italic m-0">
-                No rewards recorded for this task.
+                {t("task_details.no_rewards")}
               </p>
             ) : (
               <div className="space-y-2">
@@ -535,7 +555,7 @@ function TaskDetails() {
                       <div className="flex items-center gap-1.5 font-semibold text-neutral-900">
                         <span>{rw.member_username}</span>
                         <span className="px-1.5 py-0.2 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                          {rw.type}
+                          {rw.type === "Reward" ? t("wallet.type_reward") : rw.type}
                         </span>
                       </div>
                       {rw.notes && (

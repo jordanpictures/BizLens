@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { money, formatDate, formatDuration } from "../utils/format";
 
@@ -26,6 +27,7 @@ const toDateInput = (dateStr) => {
 };
 
 function BookingDetails() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
@@ -179,17 +181,17 @@ function BookingDetails() {
           to="/bookings"
           className="text-sm text-neutral-500 hover:text-text hover:underline flex items-center gap-1"
         >
-          ← Back to Bookings
+          ← {t("booking_details.back")}
         </Link>
       </div>
-      <PageHeader title="Booking Details" sub={`ID: ${booking.id}`} />
+      <PageHeader title={t("booking_details.title")} sub={`ID: ${booking.id}`} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Service Information Card */}
         <div className="card-panel p-6 col-span-1 md:col-span-2">
           <div className="flex justify-between items-center mb-4 border-b border-line pb-3">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold m-0">Service Information</h3>
+              <h3 className="text-lg font-semibold m-0">{t("booking_details.service_info")}</h3>
               {serviceSuccess && (
                 <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
                   <svg
@@ -204,7 +206,7 @@ function BookingDetails() {
                   >
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  Saved
+                  {t("booking_details.saved")}
                 </span>
               )}
             </div>
@@ -227,7 +229,7 @@ function BookingDetails() {
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                 </svg>
-                Edit
+                {t("booking_details.edit")}
               </button>
             ) : (
               <div className="flex items-center gap-2">
@@ -237,7 +239,7 @@ function BookingDetails() {
                   disabled={savingService}
                   className="px-3 py-1 text-xs font-medium rounded-lg border border-neutral-300 hover:bg-neutral-100 text-neutral-700 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  Cancel
+                  {t("booking_details.cancel")}
                 </button>
                 <button
                   type="button"
@@ -245,7 +247,7 @@ function BookingDetails() {
                   disabled={savingService}
                   className="px-3 py-1 text-xs font-semibold rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  {savingService ? "Saving..." : "Save"}
+                  {savingService ? t("booking_details.saving") : t("booking_details.save")}
                 </button>
               </div>
             )}
@@ -261,19 +263,19 @@ function BookingDetails() {
             <div className="grid grid-cols-2 gap-y-4">
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Service Type
+                  {t("booking_details.service_type")}
                 </div>
                 <div className="font-medium">{booking.service_type}</div>
               </div>
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Package(s)
+                  {t("booking_details.packages")}
                 </div>
-                <div className="font-medium">{booking.package || "None"}</div>
+                <div className="font-medium">{booking.package || t("booking_details.none")}</div>
               </div>
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Start Time
+                  {t("booking_details.start_time")}
                 </div>
                 <div className="font-medium">
                   {formatDate(booking.start_time, true)}
@@ -281,38 +283,38 @@ function BookingDetails() {
               </div>
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Duration / End Time
+                  {t("booking_details.duration_end")}
                 </div>
                 <div className="font-medium">
                   {booking.end_time
-                    ? `${formatDuration(booking.start_time, booking.end_time)} (Ends ${formatDate(booking.end_time, true)})`
-                    : "Not specified"}
+                    ? `${formatDuration(booking.start_time, booking.end_time)} (${t("booking_details.ends")} ${formatDate(booking.end_time, true)})`
+                    : t("booking_details.not_specified")}
                 </div>
               </div>
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Quantity
+                  {t("booking_details.quantity")}
                 </div>
                 <div className="font-medium">{booking.quantity}</div>
               </div>
               <div>
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Due Date
+                  {t("booking_details.due_date")}
                 </div>
                 <div className="font-medium text-text">
                   {booking.due_date
                     ? formatDate(booking.due_date)
-                    : "Not specified"}
+                    : t("booking_details.not_specified")}
                 </div>
               </div>
               <div className="col-span-2 mt-2">
                 <div className="text-xs text-muted uppercase tracking-wider mb-1">
-                  Notes
+                  {t("booking_details.notes")}
                 </div>
                 <div className="text-sm bg-neutral-50 p-3 rounded-lg border border-neutral-100 min-h-[60px]">
                   {booking.notes || (
                     <span className="text-neutral-400 italic">
-                      No notes provided.
+                      {t("booking_details.no_notes")}
                     </span>
                   )}
                 </div>
@@ -323,7 +325,7 @@ function BookingDetails() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1 font-medium">
-                    Service Type *
+                    {t("booking_details.service_type")} *
                   </label>
                   <select
                     name="service_type"
@@ -346,14 +348,14 @@ function BookingDetails() {
                       </option>
                     ))}
                     {services.length === 0 && !serviceForm.service_type && (
-                      <option value="">No services configured</option>
+                      <option value="">{t("settings.no_services")}</option>
                     )}
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1 font-medium">
-                    Quantity *
+                    {t("booking_details.quantity")} *
                   </label>
                   <input
                     type="number"
@@ -368,7 +370,7 @@ function BookingDetails() {
 
                 <div className="md:col-span-2">
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1.5 font-medium">
-                    Package(s)
+                    {t("booking_details.packages")}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {availablePackages.map((pkg) => {
@@ -396,7 +398,7 @@ function BookingDetails() {
                     })}
                     {availablePackages.length === 0 && (
                       <span className="text-xs text-muted">
-                        No packages configured.
+                        {t("settings.no_packages")}
                       </span>
                     )}
                   </div>
@@ -404,7 +406,7 @@ function BookingDetails() {
 
                 <div>
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1 font-medium">
-                    Start Time *
+                    {t("booking_details.start_time")} *
                   </label>
                   <input
                     type="datetime-local"
@@ -418,7 +420,7 @@ function BookingDetails() {
 
                 <div>
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1 font-medium">
-                    End Time
+                    {t("booking_details.duration_end")}
                   </label>
                   <input
                     type="datetime-local"
@@ -431,7 +433,7 @@ function BookingDetails() {
 
                 <div className="md:col-span-2">
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1 font-medium">
-                    Due Date (Optional)
+                    {t("booking_details.due_date")}
                   </label>
                   <input
                     type="date"
@@ -444,7 +446,7 @@ function BookingDetails() {
 
                 <div className="md:col-span-2">
                   <label className="block text-xs text-muted uppercase tracking-wider mb-1 font-medium">
-                    Notes
+                    {t("booking_details.notes")}
                   </label>
                   <textarea
                     name="notes"
@@ -464,14 +466,14 @@ function BookingDetails() {
                   disabled={savingService}
                   className="btn bg-white border border-line text-text hover:bg-neutral-50 text-sm"
                 >
-                  Cancel
+                  {t("booking_details.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={savingService}
                   className="btn text-sm"
                 >
-                  {savingService ? "Saving Changes..." : "Save Changes"}
+                  {savingService ? t("booking_details.saving_changes") : t("booking_details.save_changes")}
                 </button>
               </div>
             </form>
@@ -481,14 +483,14 @@ function BookingDetails() {
         {/* Customer & Financials Card */}
         <div className="card-panel p-6 flex flex-col">
           <h3 className="text-lg font-semibold mb-4 border-b border-line pb-3">
-            Customer & Financials
+            {t("booking_details.customer_financials")}
           </h3>
           <div className="mb-6">
             <div className="text-xs text-muted uppercase tracking-wider mb-1">
-              Customer
+              {t("booking_details.customer")}
             </div>
             <div className="font-semibold text-lg">
-              {booking.customer_name || "Walk-in Customer"}
+              {booking.customer_name || t("bookings.walk_in_customer")}
             </div>
             {booking.customer_phone && (
               <div className="text-sm text-muted">{booking.customer_phone}</div>
@@ -499,15 +501,15 @@ function BookingDetails() {
 
           <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-100">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted text-sm">Total Agreed</span>
+              <span className="text-muted text-sm">{t("booking_details.total_agreed")}</span>
               <span className="font-medium">{money(total)}</span>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted text-sm">Total Paid</span>
+              <span className="text-muted text-sm">{t("booking_details.total_paid")}</span>
               <span className="font-medium text-green-700">{money(paid)}</span>
             </div>
             <div className="flex justify-between items-center mt-3 pt-3 border-t border-neutral-200">
-              <span className="font-semibold text-sm">Balance Due</span>
+              <span className="font-semibold text-sm">{t("booking_details.balance_due")}</span>
               <span
                 className={`font-bold ${due > 0 ? "text-red-600" : "text-neutral-500"}`}
               >
@@ -521,7 +523,7 @@ function BookingDetails() {
               className="btn mt-4 w-full"
               onClick={() => navigate(`/record-payment?booking=${booking.id}`)}
             >
-              Record Payment
+              {t("booking_details.record_payment")}
             </button>
           )}
         </div>
@@ -529,16 +531,16 @@ function BookingDetails() {
 
       <div className="card-panel overflow-hidden">
         <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-white">
-          <h3 className="text-lg font-semibold m-0">Payment History</h3>
+          <h3 className="text-lg font-semibold m-0">{t("booking_details.payment_history")}</h3>
         </div>
 
         {booking.payments && booking.payments.length > 0 ? (
           <div className="divide-y divide-line">
             <div className="grid grid-cols-[1fr_1fr_1fr_2fr] items-center text-muted text-xs uppercase tracking-wider font-semibold py-3 px-6 bg-neutral-50">
-              <div>Date</div>
-              <div>Amount</div>
-              <div>Method</div>
-              <div>Notes</div>
+              <div>{t("booking_details.col_date")}</div>
+              <div>{t("booking_details.col_amount")}</div>
+              <div>{t("booking_details.col_method")}</div>
+              <div>{t("booking_details.col_notes")}</div>
             </div>
             {booking.payments.map((p) => (
               <div
@@ -560,7 +562,7 @@ function BookingDetails() {
           </div>
         ) : (
           <div className="p-8 text-center text-muted">
-            No payments recorded for this booking yet.
+            {t("booking_details.no_payments")}
           </div>
         )}
       </div>

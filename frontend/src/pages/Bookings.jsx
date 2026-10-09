@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import AssignTaskModal from "../components/AssignTaskModal";
 import { AuthContext } from "../context/AuthContext";
@@ -110,6 +111,7 @@ const parseDueTime = (rawDate) => {
 };
 
 function Bookings() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [bookings, setBookings] = useState([]);
@@ -200,15 +202,15 @@ function Bookings() {
       isAllSelected ||
       (services.length === 0 && selectedServices.length === 0)
     ) {
-      return "All Services";
+      return t("bookings.all_services");
     }
     if (selectedServices.length === 0) {
-      return "No Services Selected";
+      return t("bookings.no_services_selected");
     }
     if (selectedServices.length === 1) {
       return selectedServices[0];
     }
-    return `${selectedServices.length} Services Selected`;
+    return t("bookings.services_selected", { count: selectedServices.length });
   };
 
   useEffect(() => {
@@ -255,16 +257,16 @@ function Bookings() {
     if (diffDays < 0) {
       const daysAgo = Math.abs(diffDays);
       return {
-        text: `Overdue · ${daysAgo} day${daysAgo > 1 ? "s" : ""}`,
+        text: t("bookings.overdue_by", { days: daysAgo }),
         badgeClass: balance > 0 ? "red" : "green",
       };
     } else if (diffDays === 0) {
-      return { text: "Due today", badgeClass: "amber" };
+      return { text: t("bookings.due_today"), badgeClass: "amber" };
     } else if (diffDays === 1) {
-      return { text: "Due tomorrow", badgeClass: "green" };
+      return { text: t("bookings.due_tomorrow"), badgeClass: "green" };
     } else {
       return {
-        text: `In ${diffDays} days`,
+        text: t("bookings.due_in_days", { days: diffDays }),
         badgeClass: "green",
       };
     }
@@ -483,51 +485,51 @@ function Bookings() {
 
   return (
     <>
-      <PageHeader title="Bookings" sub="Manage appointments and payments" />
+      <PageHeader title={t("bookings.title")} sub={t("bookings.sub")} />
 
       <div className="flex flex-col gap-4 mb-6">
         {/* Top Controls: Due Date Filters and New Booking Button */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
             <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider shrink-0">
-              Due Date:
+              {t("bookings.due_date_label")}
             </span>
             <div className="flex gap-1 bg-neutral-100 rounded-xl p-1 overflow-x-auto w-full md:w-auto">
               <button
                 className={getBtnClass("all")}
                 onClick={() => setPeriod("all")}
               >
-                All Time
+                {t("bookings.all_time")}
               </button>
               <button
                 className={getBtnClass("today")}
                 onClick={() => setPeriod("today")}
               >
-                Today
+                {t("bookings.today")}
               </button>
               <button
                 className={getBtnClass("week")}
                 onClick={() => setPeriod("week")}
               >
-                This Week
+                {t("bookings.this_week")}
               </button>
               <button
                 className={getBtnClass("month")}
                 onClick={() => setPeriod("month")}
               >
-                This Month
+                {t("bookings.this_month")}
               </button>
               <button
                 className={getBtnClass("overdue")}
                 onClick={() => setPeriod("overdue")}
               >
-                Overdue
+                {t("bookings.overdue")}
               </button>
               <button
                 className={getBtnClass("custom")}
                 onClick={() => setPeriod("custom")}
               >
-                Custom
+                {t("bookings.custom")}
               </button>
             </div>
 
@@ -556,7 +558,7 @@ function Bookings() {
             className="btn !py-2 shrink-0 w-full md:w-auto"
             onClick={() => navigate("/new-booking")}
           >
-            + New booking
+            {t("bookings.new_btn")}
           </button>
         </div>
 
@@ -564,7 +566,7 @@ function Bookings() {
         <div className="flex flex-col md:flex-row gap-3 w-full md:justify-between items-center">
           <input
             type="text"
-            placeholder="Search name or phone..."
+            placeholder={t("bookings.search_placeholder")}
             className="input-field !py-2 w-full md:w-72"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -619,7 +621,7 @@ function Bookings() {
                   <span
                     className={`flex-1 truncate ${isAllSelected ? "font-semibold text-neutral-900" : "text-neutral-700"}`}
                   >
-                    All Services
+                    {t("bookings.all_services")}
                   </span>
                 </button>
 
@@ -627,7 +629,7 @@ function Bookings() {
 
                 {services.length === 0 ? (
                   <div className="px-3 py-2 text-xs text-neutral-400 italic">
-                    No services available
+                    {t("bookings.no_services")}
                   </div>
                 ) : (
                   services.map((s) => {
@@ -660,14 +662,19 @@ function Bookings() {
                     <div className="border-t border-neutral-100 my-1"></div>
                     <div className="px-3 py-1 flex justify-between items-center">
                       <span className="text-[11px] text-muted">
-                        {selectedServices.length} of {services.length} selected
+                        {t("bookings.selected_of", {
+                          selected: selectedServices.length,
+                          total: services.length,
+                        })}
                       </span>
                       <button
                         type="button"
                         onClick={toggleAllServices}
                         className="text-[11px] font-semibold text-neutral-900 hover:underline cursor-pointer"
                       >
-                        {isAllSelected ? "Unselect All" : "Select All"}
+                        {isAllSelected
+                          ? t("bookings.unselect_all")
+                          : t("bookings.select_all")}
                       </button>
                     </div>
                   </>
@@ -688,7 +695,7 @@ function Bookings() {
               className={`booking-tab ${balanceTab === "all" ? "active" : ""}`}
               onClick={() => setBalanceTab("all")}
             >
-              <span>All</span>
+              <span>{t("bookings.tab_all")}</span>
               <span className="count">{dateAndSearchFiltered.length}</span>
             </button>
             <button
@@ -696,7 +703,7 @@ function Bookings() {
               className={`booking-tab ${balanceTab === "open" ? "active" : ""}`}
               onClick={() => setBalanceTab("open")}
             >
-              <span>Open balance</span>
+              <span>{t("bookings.tab_open")}</span>
               <span className="count">{openBalanceCount}</span>
             </button>
             <button
@@ -704,17 +711,19 @@ function Bookings() {
               className={`booking-tab ${balanceTab === "overdue" ? "active" : ""}`}
               onClick={() => setBalanceTab("overdue")}
             >
-              <span>Overdue</span>
+              <span>{t("bookings.tab_overdue")}</span>
               <span className="count">{overdueCount}</span>
             </button>
           </div>
           <div className="booking-shown">
-            Showing{" "}
+            {t("bookings.showing")}{" "}
             {finalBookings.length === 0
               ? 0
               : (currentPage - 1) * itemsPerPage + 1}{" "}
-            to {Math.min(currentPage * itemsPerPage, finalBookings.length)} of{" "}
-            {finalBookings.length} bookings
+            {t("bookings.to")}{" "}
+            {Math.min(currentPage * itemsPerPage, finalBookings.length)}{" "}
+            {t("bookings.of")} {finalBookings.length}{" "}
+            {t("bookings.bookings_count")}
           </div>
         </div>
 
@@ -723,23 +732,23 @@ function Bookings() {
           <div className="booking-inner">
             {/* Table Header */}
             <div className="booking-cols booking-thead">
-              <div>Order time</div>
-              <div>Customer</div>
-              <div>Service</div>
-              <div>Due Date</div>
-              <div>Payment</div>
-              <div className="booking-right">Due Balance</div>
-              <div className="booking-right">Actions</div>
+              <div>{t("bookings.col_order_time")}</div>
+              <div>{t("bookings.col_customer")}</div>
+              <div>{t("bookings.col_service")}</div>
+              <div>{t("bookings.col_due_date")}</div>
+              <div>{t("bookings.col_payment")}</div>
+              <div className="booking-right">{t("bookings.col_due_balance")}</div>
+              <div className="booking-right">{t("bookings.col_actions")}</div>
             </div>
 
             {/* Table Rows */}
             {loading ? (
               <div className="p-8 text-center text-muted">
-                Loading bookings...
+                {t("bookings.loading")}
               </div>
             ) : paginatedBookings.length === 0 ? (
               <div className="p-8 text-center text-muted">
-                No bookings found matching filters.
+                {t("bookings.no_bookings")}
               </div>
             ) : (
               <div className="booking-rows">
@@ -813,7 +822,7 @@ function Bookings() {
                               to={`/bookings/${b.id}`}
                               className="hover:underline text-text"
                             >
-                              {b.customer_name || "Walk-in Customer"}
+                              {b.customer_name || t("bookings.walk_in_customer")}
                             </Link>
                           </div>
                           {b.customer_phone && (
@@ -887,7 +896,7 @@ function Bookings() {
                           <div style={{ width: `${pct}%` }}></div>
                         </div>
                         <div className="booking-t12 booking-muted">
-                          of {money(total)}
+                          {t("bookings.of")} {money(total)}
                         </div>
                       </div>
 
@@ -904,11 +913,11 @@ function Bookings() {
                         {balance > 0 ? (
                           <span className="booking-badge amber">
                             <i></i>
-                            {paid > 0 ? "Partial" : "Unpaid"}
+                            {paid > 0 ? t("bookings.partial") : t("bookings.unpaid")}
                           </span>
                         ) : (
                           <span className="booking-badge green">
-                            <i></i>Paid
+                            <i></i>{t("bookings.paid")}
                           </span>
                         )}
                       </div>
@@ -924,7 +933,7 @@ function Bookings() {
                           ? b.assignees.length > 1
                             ? `${firstAssignee.username} +${b.assignees.length - 1}`
                             : firstAssignee.username
-                          : "Assign";
+                          : t("bookings.assign_btn");
                         const assignBg = hasAssignees
                           ? tintOf(firstAssignee.username)
                           : undefined;
@@ -977,7 +986,7 @@ function Bookings() {
                                 }
                               >
                                 <Icons.Plus />
-                                <span>Add Pay</span>
+                                <span>{t("bookings.add_pay")}</span>
                               </button>
                             )}
                           </div>
@@ -995,9 +1004,10 @@ function Bookings() {
         {!loading && totalPages > 1 && (
           <div className="px-5 py-4 border-t border-line flex justify-between items-center bg-white">
             <div className="text-sm text-muted">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, finalBookings.length)} of{" "}
-              {finalBookings.length}
+              {t("bookings.showing")} {(currentPage - 1) * itemsPerPage + 1}{" "}
+              {t("bookings.to")}{" "}
+              {Math.min(currentPage * itemsPerPage, finalBookings.length)}{" "}
+              {t("bookings.of")} {finalBookings.length}
             </div>
             <div className="flex gap-1">
               <button
@@ -1005,14 +1015,14 @@ function Bookings() {
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
               >
-                Prev
+                {t("bookings.prev")}
               </button>
               <button
                 className="px-3 py-1 text-sm border border-line rounded disabled:opacity-50 hover:bg-neutral-50 cursor-pointer"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
               >
-                Next
+                {t("bookings.next")}
               </button>
             </div>
           </div>

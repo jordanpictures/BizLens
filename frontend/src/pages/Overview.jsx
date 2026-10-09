@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { money, formatDate } from "../utils/format";
 import {
@@ -13,6 +14,7 @@ import {
 } from "recharts";
 
 function Overview() {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState([]);
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ function Overview() {
     if (!percent)
       return (
         <div className="text-neutral-400 text-xs mt-2 font-medium">
-          No change
+          {t("overview.no_change")}
         </div>
       );
     const isPositive = percent > 0;
@@ -45,7 +47,7 @@ function Overview() {
       <div
         className={`${isPositive ? "text-green-700" : "text-red-600"} text-xs mt-2 font-medium`}
       >
-        {isPositive ? "↑" : "↓"} {Math.abs(percent)}% vs last month
+        {isPositive ? "↑" : "↓"} {Math.abs(percent)}% {t("overview.vs_last_month")}
       </div>
     );
   };
@@ -53,39 +55,38 @@ function Overview() {
   return (
     <>
       <PageHeader
-        title="Overview"
+        title={t("overview.title")}
         sub={formatDate(new Date())}
-       
       />
 
       {loading ? (
-        <div className="p-8 text-center text-muted">Loading dashboard...</div>
+        <div className="p-8 text-center text-muted">{t("overview.loading")}</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Month bookings</div>
+              <div className="text-muted text-sm mb-3">{t("overview.month_bookings")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {reports?.bookings || 0}
               </div>
               {renderChange(reports?.changes?.bookings)}
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Month Income</div>
+              <div className="text-muted text-sm mb-3">{t("overview.month_income")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(reports?.revenue || 0)}
               </div>
               {renderChange(reports?.changes?.revenue)}
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Month Expenses</div>
+              <div className="text-muted text-sm mb-3">{t("overview.month_expenses")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(reports?.expenses || 0)}
               </div>
               {renderChange(reports?.changes?.expenses)}
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Month Net profit</div>
+              <div className="text-muted text-sm mb-3">{t("overview.month_profit")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {money(reports?.profit || 0)}
               </div>
@@ -96,7 +97,7 @@ function Overview() {
           <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5">
             <div className="card-panel p-6">
               <div className="font-semibold text-base mb-5">
-                Income Trend (This Month)
+                {t("overview.income_trend")}
               </div>
               <div className="h-56 mb-2 w-full">
                 {reports?.timeline?.length > 0 ? (
@@ -146,8 +147,8 @@ function Overview() {
                         dx={-10}
                       />
                       <Tooltip
-                        labelFormatter={(t) => formatDate(t)}
-                        formatter={(val) => [money(val), "Revenue"]}
+                        labelFormatter={(timeVal) => formatDate(timeVal)}
+                        formatter={(val) => [money(val), t("overview.revenue")]}
                         contentStyle={{
                           borderRadius: "8px",
                           border: "1px solid #e5e5e5",
@@ -166,7 +167,7 @@ function Overview() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted">
-                    No data available for this month.
+                    {t("overview.no_data")}
                   </div>
                 )}
               </div>
@@ -174,11 +175,11 @@ function Overview() {
 
             <div className="card-panel p-6">
               <div className="font-semibold text-base mb-4">
-                Recent Bookings
+                {t("overview.recent_bookings")}
               </div>
               <div className="flex flex-col">
                 {bookings.length === 0 ? (
-                  <div className="text-muted text-sm">No recent bookings.</div>
+                  <div className="text-muted text-sm">{t("overview.no_recent")}</div>
                 ) : (
                   bookings.slice(0, 5).map((b) => (
                     <div
@@ -191,7 +192,7 @@ function Overview() {
                             to={`/bookings/${b.id}`}
                             className="hover:underline"
                           >
-                            {b.customer_name || "Walk-in Customer"}
+                            {b.customer_name || t("bookings.walk_in_customer")}
                           </Link>
                         </b>
                         <div className="text-muted text-sm mt-1">
@@ -204,7 +205,7 @@ function Overview() {
                         </span>
                         <br />
                         <span className="text-muted text-sm">
-                          {money(parseFloat(b.agreed_price))} agreed
+                          {money(parseFloat(b.agreed_price))} {t("overview.agreed")}
                         </span>
                       </div>
                     </div>

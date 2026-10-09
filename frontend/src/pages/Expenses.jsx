@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import { money, formatDate, downloadCSV } from "../utils/format";
 
 function Expenses() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,21 +51,21 @@ function Expenses() {
 
   return (
     <>
-      <PageHeader title="Expenses" sub="Business costs" />
+      <PageHeader title={t("expenses.title")} sub={t("expenses.sub")} />
 
       {loading ? (
-        <div className="p-8 text-center text-muted">Loading expenses...</div>
+        <div className="p-8 text-center text-muted">{t("expenses.loading")}</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Total expenses</div>
+              <div className="text-muted text-sm mb-3">{t("expenses.total_expenses")}</div>
               <div className="text-3xl font-bold tracking-tight text-red-600">
                 {money(totalExpenses)}
               </div>
             </div>
             <div className="card-panel p-5">
-              <div className="text-muted text-sm mb-3">Entries</div>
+              <div className="text-muted text-sm mb-3">{t("expenses.entries")}</div>
               <div className="text-3xl font-bold tracking-tight">
                 {filteredExpenses.length}
               </div>
@@ -90,24 +92,24 @@ function Expenses() {
             </div>
             <div className="flex gap-2 shrink-0">
               <button className="btn-secondary" onClick={handleExport}>
-                Export CSV
+                {t("expenses.export_csv")}
               </button>
               <button className="btn" onClick={() => navigate("/add-expense")}>
-                + Add expense
+                {t("expenses.add_expense_btn")}
               </button>
             </div>
           </div>
 
           <div className="card-panel overflow-hidden max-w-4xl">
             <div className="grid grid-cols-[2fr_1fr_1fr] items-center text-muted text-xs uppercase tracking-wider font-semibold py-3 px-5 border-b border-line bg-neutral-50">
-              <div>Reason</div>
-              <div>Date</div>
-              <div className="text-right">Amount</div>
+              <div>{t("expenses.col_reason")}</div>
+              <div>{t("expenses.col_date")}</div>
+              <div className="text-right">{t("expenses.col_amount")}</div>
             </div>
 
             {filteredExpenses.length === 0 ? (
               <div className="p-8 text-center text-muted">
-                No expenses found.
+                {t("expenses.no_expenses")}
               </div>
             ) : (
               filteredExpenses.map((x) => (

@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 import RewardModal from "../components/RewardModal";
 import WithdrawModal from "../components/WithdrawModal";
@@ -6,6 +7,7 @@ import { AuthContext } from "../context/AuthContext";
 import { money, formatDate } from "../utils/format";
 
 function Wallet() {
+  const { t } = useTranslation();
   const { user } = useContext(AuthContext);
   const isOwner = user?.role === "Owner";
 
@@ -139,18 +141,20 @@ function Wallet() {
   // Filtered transactions (Owner sees all company transactions; members see own)
   const displayedTransactions = useMemo(() => {
     const list = isOwner ? allTransactions : personalData.transactions || [];
-    return list.filter((t) => {
-      if (typeFilter !== "all" && t.type !== typeFilter) return false;
-      if (isOwner && memberFilter !== "all" && t.user_id !== memberFilter)
+    return list.filter((tx) => {
+      if (typeFilter !== "all" && tx.type !== typeFilter) return false;
+      if (isOwner && memberFilter !== "all" && tx.user_id !== memberFilter)
         return false;
       if (search.trim()) {
         const q = search.toLowerCase();
-        const matchesType = t.type?.toLowerCase().includes(q);
-        const matchesNote = t.notes?.toLowerCase().includes(q);
-        const matchesTask = t.task_title?.toLowerCase().includes(q);
-        const matchesCustomer = t.customer_name?.toLowerCase().includes(q);
-        const matchesCreator = t.created_by_username?.toLowerCase().includes(q);
-        const matchesMember = t.member_username?.toLowerCase().includes(q);
+        const matchesType = tx.type?.toLowerCase().includes(q);
+        const matchesNote = tx.notes?.toLowerCase().includes(q);
+        const matchesTask = tx.task_title?.toLowerCase().includes(q);
+        const matchesCustomer = tx.customer_name?.toLowerCase().includes(q);
+        const matchesCreator = tx.created_by_username
+          ?.toLowerCase()
+          .includes(q);
+        const matchesMember = tx.member_username?.toLowerCase().includes(q);
         return (
           matchesType ||
           matchesNote ||
@@ -170,6 +174,36 @@ function Wallet() {
     memberFilter,
     search,
   ]);
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "Approved":
+        return t("status.approved");
+      case "Pending":
+        return t("status.pending");
+      case "Rejected":
+        return t("status.rejected");
+      case "In Progress":
+        return t("status.in_progress");
+      case "Completed":
+        return t("status.completed");
+      case "Cancelled":
+        return t("status.cancelled");
+      default:
+        return status;
+    }
+  };
+
+  const getTypeText = (type) => {
+    switch (type) {
+      case "Reward":
+        return t("wallet.type_reward");
+      case "Withdrawal":
+        return t("wallet.type_withdrawal");
+      default:
+        return type;
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -198,12 +232,8 @@ function Wallet() {
   return (
     <>
       <PageHeader
-        title="Wallet"
-        sub={
-          isOwner
-            ? "Manage team payouts, rewards, and withdrawal requests"
-            : "Your balance, rewards, and withdrawal requests"
-        }
+        title={t("wallet.title")}
+        sub={isOwner ? t("wallet.sub_owner") : t("wallet.sub_member")}
       />
 
       {/* Action Bar on new line */}
@@ -230,7 +260,7 @@ function Wallet() {
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>Reward Member</span>
+            <span>{t("wallet.reward_member")}</span>
           </button>
         ) : (
           <button
@@ -252,7 +282,7 @@ function Wallet() {
               <line x1="12" y1="19" x2="12" y2="5"></line>
               <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
-            <span>Request Withdrawal</span>
+            <span>{t("wallet.request_withdrawal")}</span>
           </button>
         )}
       </div>
@@ -275,20 +305,20 @@ function Wallet() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-2xl border border-line p-5 shadow-xs">
             <div className="text-xs uppercase tracking-wider text-muted font-semibold mb-1">
-              Total Paid Out
+              {t("wallet.total_paid_out")}
             </div>
             <div className="text-2xl font-bold text-neutral-900 tracking-tight">
               {money(overviewData.summary.total_paid_out)}
             </div>
             <div className="text-[11px] text-neutral-400 mt-1">
-              Completed team withdrawals
+              {t("wallet.completed_withdrawals")}
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-line p-5 shadow-xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs uppercase tracking-wider text-muted font-semibold">
-                Pending Requests
+                {t("wallet.pending_requests")}
               </span>
               {overviewData.summary.pending_requests_count > 0 && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
@@ -300,19 +330,19 @@ function Wallet() {
               {money(overviewData.summary.total_pending_amount)}
             </div>
             <div className="text-[11px] text-neutral-400 mt-1">
-              Awaiting owner review
+              {t("wallet.awaiting_review")}
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-line p-5 shadow-xs">
             <div className="text-xs uppercase tracking-wider text-muted font-semibold mb-1">
-              Total Rewards Awarded
+              {t("wallet.total_rewards_awarded")}
             </div>
             <div className="text-2xl font-bold text-neutral-900 tracking-tight">
               {money(overviewData.summary.total_rewards_awarded)}
             </div>
             <div className="text-[11px] text-neutral-400 mt-1">
-              Total allowances & rewards given
+              {t("wallet.total_rewards_awarded")}
             </div>
           </div>
         </div>
@@ -320,49 +350,49 @@ function Wallet() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-2xl border border-neutral-900 p-5 shadow-xs">
             <div className="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-1">
-              Available Balance
+              {t("wallet.available_balance")}
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
               {money(personalData.balance.available_balance)}
             </div>
             <div className="text-[11px] text-neutral-500 mt-1 font-medium">
-              Ready for withdrawal
+              {t("wallet.ready_for_withdrawal")}
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-line p-5 shadow-xs">
             <div className="text-xs uppercase tracking-wider text-muted font-semibold mb-1">
-              Total Rewards Earned
+              {t("wallet.total_earned")}
             </div>
             <div className="text-2xl font-bold text-neutral-900 tracking-tight">
               {money(personalData.balance.total_earned)}
             </div>
             <div className="text-[11px] text-neutral-400 mt-1">
-              Earned from tasks & allowances
+              {t("wallet.total_earned")}
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-line p-5 shadow-xs">
             <div className="text-xs uppercase tracking-wider text-muted font-semibold mb-1">
-              Total Paid Out
+              {t("wallet.total_paid_out")}
             </div>
             <div className="text-2xl font-bold text-neutral-900 tracking-tight">
               {money(personalData.balance.total_withdrawn)}
             </div>
             <div className="text-[11px] text-neutral-400 mt-1">
-              Successfully received
+              {t("wallet.completed_withdrawals")}
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-line p-5 shadow-xs">
             <div className="text-xs uppercase tracking-wider text-muted font-semibold mb-1">
-              Pending Payouts
+              {t("wallet.pending_payouts")}
             </div>
             <div className="text-2xl font-bold text-amber-700 tracking-tight">
               {money(personalData.balance.pending_withdrawals)}
             </div>
             <div className="text-[11px] text-neutral-400 mt-1">
-              In review by owner
+              {t("wallet.awaiting_review")}
             </div>
           </div>
         </div>
@@ -375,12 +405,12 @@ function Wallet() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
               <h3 className="text-base font-bold text-neutral-900 m-0">
-                Pending Withdrawal Requests (
+                {t("wallet.pending_requests_title")} (
                 {overviewData.pending_requests.length})
               </h3>
             </div>
             <span className="text-xs font-semibold text-amber-800">
-              Review and approve payouts
+              {t("wallet.review_approve")}
             </span>
           </div>
 
@@ -406,25 +436,31 @@ function Wallet() {
                       </div>
                     </div>
                     <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">
-                      Pending
+                      {getStatusText("Pending")}
                     </span>
                   </div>
 
                   <div className="mb-3 space-y-1.5 bg-neutral-50 p-2.5 rounded-lg border border-neutral-100 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-neutral-500">Amount:</span>
+                      <span className="text-neutral-500">
+                        {t("common.amount")}:
+                      </span>
                       <span className="font-bold text-neutral-900 text-sm">
                         {money(parseFloat(req.amount))}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-neutral-500">Method:</span>
+                      <span className="text-neutral-500">
+                        {t("wallet.method")}:
+                      </span>
                       <span className="font-semibold text-neutral-800">
                         {req.payment_method || "Cash"}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-neutral-500">Requested:</span>
+                      <span className="text-neutral-500">
+                        {t("wallet.requested")}:
+                      </span>
                       <span className="text-neutral-700">
                         {formatDate(req.created_at, true)}
                       </span>
@@ -444,7 +480,7 @@ function Wallet() {
                     onClick={() => handleReject(req.id)}
                     className="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg border border-neutral-300 hover:bg-neutral-50 text-neutral-700 transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    Reject
+                    {t("wallet.reject")}
                   </button>
                   <button
                     type="button"
@@ -453,8 +489,8 @@ function Wallet() {
                     className="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
                   >
                     {processingId === req.id
-                      ? "Processing..."
-                      : "Approve Payout"}
+                      ? t("wallet.processing")
+                      : t("wallet.approve_payout")}
                   </button>
                 </div>
               </div>
@@ -469,11 +505,10 @@ function Wallet() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base font-bold text-neutral-900 m-0">
-                Team Members Wallets
+                {t("wallet.team_wallets")}
               </h3>
               <p className="text-xs text-muted m-0 mt-0.5">
-                Overview of balances, earned rewards, and withdrawal requests
-                per member
+                {t("wallet.team_wallets_sub")}
               </p>
             </div>
           </div>
@@ -482,14 +517,20 @@ function Wallet() {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-line text-neutral-500 uppercase tracking-wider text-[11px]">
-                  <th className="pb-3 font-semibold">Team Member</th>
-                  <th className="pb-3 font-semibold">Total Rewards</th>
-                  <th className="pb-3 font-semibold">Withdrawn</th>
-                  <th className="pb-3 font-semibold">Pending</th>
-                  <th className="pb-3 font-semibold text-right">
-                    Available Balance
+                  <th className="pb-3 font-semibold">{t("wallet.member")}</th>
+                  <th className="pb-3 font-semibold">
+                    {t("wallet.total_rewards")}
                   </th>
-                  <th className="pb-3 font-semibold text-right">Action</th>
+                  <th className="pb-3 font-semibold">
+                    {t("wallet.withdrawn")}
+                  </th>
+                  <th className="pb-3 font-semibold">{t("wallet.pending")}</th>
+                  <th className="pb-3 font-semibold text-right">
+                    {t("wallet.available_balance")}
+                  </th>
+                  <th className="pb-3 font-semibold text-right">
+                    {t("common.action")}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -542,7 +583,7 @@ function Wallet() {
                         }}
                         className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-line bg-white hover:bg-neutral-100 text-neutral-800 transition-colors cursor-pointer"
                       >
-                        Reward
+                        {t("wallet.reward")}
                       </button>
                     </td>
                   </tr>
@@ -557,7 +598,7 @@ function Wallet() {
       {!isOwner && personalData.withdrawal_requests.length > 0 && (
         <div className="bg-white rounded-2xl border border-line p-6 shadow-xs mb-8">
           <h3 className="text-base font-bold text-neutral-900 mb-3 m-0">
-            My Withdrawal Requests
+            {t("wallet.my_requests")}
           </h3>
           <div className="space-y-2.5">
             {personalData.withdrawal_requests.map((r) => (
@@ -573,7 +614,7 @@ function Wallet() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(r.status)}`}
                     >
-                      {r.status}
+                      {getStatusText(r.status)}
                     </span>
                     <span className="text-neutral-500">
                       via {r.payment_method || "Cash"}
@@ -604,11 +645,10 @@ function Wallet() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
             <h3 className="text-base font-bold text-neutral-900 m-0">
-              {isOwner ? "All Transactions Ledger" : "Transaction History"}
+              {isOwner ? t("wallet.ledger_title") : t("wallet.history_title")}
             </h3>
             <p className="text-xs text-muted m-0 mt-0.5">
-              Complete chronological record of all rewards and withdrawal
-              payouts
+              {t("wallet.ledger_sub")}
             </p>
           </div>
 
@@ -620,7 +660,7 @@ function Wallet() {
                 onChange={(e) => setMemberFilter(e.target.value)}
                 className="text-xs px-2.5 py-1.5 rounded-lg border border-line bg-white focus:outline-hidden focus:border-neutral-800 transition-colors"
               >
-                <option value="all">All Members</option>
+                <option value="all">{t("wallet.all_members")}</option>
                 {overviewData.team_wallets.map((tm) => (
                   <option key={tm.user_id} value={tm.user_id}>
                     {tm.username}
@@ -642,7 +682,7 @@ function Wallet() {
                       : "text-neutral-500 hover:text-neutral-900"
                   }`}
                 >
-                  {tp === "all" ? "All" : tp}
+                  {tp === "all" ? t("common.all") : getTypeText(tp)}
                 </button>
               ))}
             </div>
@@ -652,8 +692,8 @@ function Wallet() {
               type="text"
               placeholder={
                 isOwner
-                  ? "Search member, notes, task..."
-                  : "Search notes, task..."
+                  ? t("wallet.search_placeholder_owner")
+                  : t("wallet.search_placeholder_member")
               }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -665,21 +705,25 @@ function Wallet() {
         {/* Transactions Table */}
         {displayedTransactions.length === 0 ? (
           <div className="py-12 text-center text-xs text-neutral-400 italic">
-            No transactions found.
+            {t("wallet.no_transactions")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-line text-neutral-500 uppercase tracking-wider text-[11px]">
-                  <th className="pb-3 font-semibold">Date</th>
+                  <th className="pb-3 font-semibold">{t("common.date")}</th>
                   {isOwner && (
-                    <th className="pb-3 font-semibold">Team Member</th>
+                    <th className="pb-3 font-semibold">{t("wallet.member")}</th>
                   )}
-                  <th className="pb-3 font-semibold">Type</th>
-                  <th className="pb-3 font-semibold">Description / Notes</th>
-                  <th className="pb-3 font-semibold">Status</th>
-                  <th className="pb-3 font-semibold text-right">Amount</th>
+                  <th className="pb-3 font-semibold">{t("wallet.type")}</th>
+                  <th className="pb-3 font-semibold">
+                    {t("wallet.desc_notes")}
+                  </th>
+                  <th className="pb-3 font-semibold">{t("common.status")}</th>
+                  <th className="pb-3 font-semibold text-right">
+                    {t("common.amount")}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -707,7 +751,7 @@ function Wallet() {
                         <span
                           className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${getTypeBadge(tx.type)}`}
                         >
-                          {tx.type}
+                          {getTypeText(tx.type)}
                         </span>
                       </td>
                       <td className="py-3 max-w-xs">
@@ -715,7 +759,7 @@ function Wallet() {
                           {tx.notes ||
                             (tx.type === "Withdrawal"
                               ? `Payout request via ${tx.payment_method}`
-                              : "Reward")}
+                              : t("wallet.type_reward"))}
                         </div>
                         {tx.task_title && (
                           <div className="text-[10px] text-neutral-400 truncate">
@@ -727,7 +771,7 @@ function Wallet() {
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(tx.status)}`}
                         >
-                          {tx.status}
+                          {getStatusText(tx.status)}
                         </span>
                       </td>
                       <td className="py-3 text-right whitespace-nowrap">

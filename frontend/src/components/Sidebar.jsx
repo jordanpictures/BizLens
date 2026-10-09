@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "../context/AuthContext";
 
 const Icons = {
@@ -169,6 +170,7 @@ const Icons = {
 
 function Sidebar() {
   const { user, logout } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   // Use .env configured name, fallback to "service."
   const companyName = import.meta.env.VITE_COMPANY_NAME || "service.";
@@ -209,47 +211,47 @@ function Sidebar() {
             /* Team Members see Tasks and Wallet */
             <>
               <NavLink to="/tasks" className={linkClass}>
-                <Icons.Tasks /> Tasks
+                <Icons.Tasks /> {t("nav.tasks", "Tasks")}
               </NavLink>
               <NavLink to="/wallet" className={linkClass}>
-                <Icons.Wallet /> Wallet
+                <Icons.Wallet /> {t("nav.wallet", "Wallet")}
               </NavLink>
             </>
           ) : (
             /* Owners & Staff see standard navigation */
             <>
               <NavLink to="/" end className={linkClass}>
-                <Icons.Overview /> Overview
+                <Icons.Overview /> {t("nav.overview", "Overview")}
               </NavLink>
               <NavLink to="/bookings" className={linkClass}>
-                <Icons.Bookings /> Bookings
+                <Icons.Bookings /> {t("nav.bookings", "Bookings")}
               </NavLink>
               <NavLink to="/tasks" className={linkClass}>
-                <Icons.Tasks /> Tasks
+                <Icons.Tasks /> {t("nav.tasks", "Tasks")}
               </NavLink>
               <NavLink to="/payments" className={linkClass}>
-                <Icons.Payments /> Payments
+                <Icons.Payments /> {t("nav.payments", "Payments")}
               </NavLink>
               <NavLink to="/expenses" className={linkClass}>
-                <Icons.Expenses /> Expenses
+                <Icons.Expenses /> {t("nav.expenses", "Expenses")}
               </NavLink>
               <NavLink to="/reports" className={linkClass}>
-                <Icons.Reports /> Reports
+                <Icons.Reports /> {t("nav.reports", "Reports")}
               </NavLink>
               <NavLink to="/wallet" className={linkClass}>
-                <Icons.Wallet /> Wallet
+                <Icons.Wallet /> {t("nav.wallet", "Wallet")}
               </NavLink>
 
               {user?.role === "Owner" && (
                 <>
                   <div className="mt-6 mb-1.5 px-3 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                    System
+                    {t("nav.system", "System")}
                   </div>
                   <NavLink to="/users" className={linkClass}>
-                    <Icons.Users /> Users
+                    <Icons.Users /> {t("nav.users", "Users")}
                   </NavLink>
                   <NavLink to="/settings" className={linkClass}>
-                    <Icons.Settings /> Settings
+                    <Icons.Settings /> {t("nav.settings", "Settings")}
                   </NavLink>
                 </>
               )}
@@ -266,52 +268,52 @@ function Sidebar() {
           <>
             <NavLink to="/tasks" className={mobileLinkClass}>
               <Icons.Tasks />
-              <span className="mt-1">Tasks</span>
+              <span className="mt-1">{t("nav.tasks", "Tasks")}</span>
             </NavLink>
             <NavLink to="/wallet" className={mobileLinkClass}>
               <Icons.Wallet />
-              <span className="mt-1">Wallet</span>
+              <span className="mt-1">{t("nav.wallet", "Wallet")}</span>
             </NavLink>
           </>
         ) : (
           <>
             <NavLink to="/" end className={mobileLinkClass}>
               <Icons.Overview />
-              <span className="mt-1">Home</span>
+              <span className="mt-1">{t("nav.home", "Home")}</span>
             </NavLink>
             <NavLink to="/bookings" className={mobileLinkClass}>
               <Icons.Bookings />
-              <span className="mt-1">Bookings</span>
+              <span className="mt-1">{t("nav.bookings", "Bookings")}</span>
             </NavLink>
             <NavLink to="/tasks" className={mobileLinkClass}>
               <Icons.Tasks />
-              <span className="mt-1">Tasks</span>
+              <span className="mt-1">{t("nav.tasks", "Tasks")}</span>
             </NavLink>
             <NavLink to="/payments" className={mobileLinkClass}>
               <Icons.Payments />
-              <span className="mt-1">Payments</span>
+              <span className="mt-1">{t("nav.payments", "Payments")}</span>
             </NavLink>
             <NavLink to="/expenses" className={mobileLinkClass}>
               <Icons.Expenses />
-              <span className="mt-1">Expenses</span>
+              <span className="mt-1">{t("nav.expenses", "Expenses")}</span>
             </NavLink>
             <NavLink to="/reports" className={mobileLinkClass}>
               <Icons.Reports />
-              <span className="mt-1">Reports</span>
+              <span className="mt-1">{t("nav.reports", "Reports")}</span>
             </NavLink>
             <NavLink to="/wallet" className={mobileLinkClass}>
               <Icons.Wallet />
-              <span className="mt-1">Wallet</span>
+              <span className="mt-1">{t("nav.wallet", "Wallet")}</span>
             </NavLink>
             {user?.role === "Owner" && (
               <>
                 <NavLink to="/users" className={mobileLinkClass}>
                   <Icons.Users />
-                  <span className="mt-1">Users</span>
+                  <span className="mt-1">{t("nav.users", "Users")}</span>
                 </NavLink>
                 <NavLink to="/settings" className={mobileLinkClass}>
                   <Icons.Settings />
-                  <span className="mt-1">Settings</span>
+                  <span className="mt-1">{t("nav.settings", "Settings")}</span>
                 </NavLink>
               </>
             )}

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { money } from "../utils/format";
 
 function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Telebirr");
   const [notes, setNotes] = useState("");
@@ -74,10 +76,10 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
         <div className="px-6 py-5 border-b border-line flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-neutral-900 m-0">
-              Request Withdrawal
+              {t("withdraw_modal.title")}
             </h3>
             <p className="text-xs text-neutral-500 m-0 mt-0.5">
-              Available balance:{" "}
+              {t("withdraw_modal.available")}{" "}
               <span className="font-bold text-neutral-900">
                 {money(availableBalance)}
               </span>
@@ -86,7 +88,7 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-700 p-1 rounded-lg transition-colors"
+            className="text-neutral-400 hover:text-neutral-700 p-1 rounded-lg transition-colors cursor-pointer"
           >
             <svg
               width="20"
@@ -115,7 +117,7 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold uppercase tracking-wider text-neutral-600">
-                Amount (ETB) *
+                {t("withdraw_modal.amount_label")}
               </label>
               <div className="flex gap-1">
                 {[0.25, 0.5, 1].map((f) => (
@@ -123,9 +125,9 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
                     key={f}
                     type="button"
                     onClick={() => handlePreset(f)}
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors"
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors cursor-pointer"
                   >
-                    {f === 1 ? "All" : `${f * 100}%`}
+                    {f === 1 ? t("common.all") : `${f * 100}%`}
                   </button>
                 ))}
               </div>
@@ -146,7 +148,7 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
           {/* Payment Method */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Payment Method *
+              {t("withdraw_modal.method_label")}
             </label>
             <select
               value={paymentMethod}
@@ -166,11 +168,11 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
           {/* Account Details / Notes */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1.5">
-              Account / Phone / Payout Instructions (Optional)
+              {t("withdraw_modal.instructions_label")}
             </label>
             <textarea
               rows={2}
-              placeholder="e.g. Telebirr: 0911223344 or CBE Acc: 1000123456789 (leave blank for cash in hand)"
+              placeholder={t("withdraw_modal.instructions_placeholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full p-2.5 text-sm bg-white border border-line rounded-xl focus:outline-hidden focus:border-neutral-900 transition-colors"
@@ -178,9 +180,7 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
           </div>
 
           <div className="text-[11px] text-neutral-500 leading-relaxed bg-neutral-50 p-3 rounded-xl border border-line">
-            Once submitted, your request is reviewed by the owner. Upon
-            approval, funds will be released to your requested payout account
-            and deducted from your wallet balance.
+            {t("withdraw_modal.notice")}
           </div>
 
           {/* Actions */}
@@ -189,9 +189,9 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="btn-secondary flex-1 py-2 text-xs"
+              className="btn-secondary flex-1 py-2 text-xs cursor-pointer"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -201,9 +201,9 @@ function WithdrawModal({ isOpen, onClose, onSuccess, availableBalance = 0 }) {
                 parseFloat(amount) <= 0 ||
                 parseFloat(amount) > availableBalance
               }
-              className="btn flex-1 py-2 text-xs disabled:opacity-50"
+              className="btn flex-1 py-2 text-xs disabled:opacity-50 cursor-pointer"
             >
-              {submitting ? "Submitting..." : "Submit Request"}
+              {submitting ? t("withdraw_modal.submitting") : t("withdraw_modal.submit_btn")}
             </button>
           </div>
         </form>

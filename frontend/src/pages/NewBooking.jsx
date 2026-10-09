@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/PageHeader";
 
 function NewBooking() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [services, setServices] = useState([]);
@@ -93,7 +95,7 @@ function NewBooking() {
 
   return (
     <>
-      <PageHeader title="New booking" sub="Create a booking" />
+      <PageHeader title={t("new_booking.title")} sub={t("new_booking.sub")} />
 
       <div className="card-panel p-6 md:p-8 max-w-4xl">
         <form
@@ -102,7 +104,7 @@ function NewBooking() {
         >
           <div>
             <label className="block text-muted text-sm font-medium mb-2">
-              Customer name (Optional)
+              {t("new_booking.customer_name")}
             </label>
             <input
               type="text"
@@ -110,12 +112,12 @@ function NewBooking() {
               value={formData.customer_name}
               onChange={handleChange}
               className="input-field"
-              placeholder="Walk-in customer"
+              placeholder={t("new_booking.walk_in_ph")}
             />
           </div>
           <div>
             <label className="block text-muted text-sm font-medium mb-2">
-              Phone (Optional)
+              {t("new_booking.phone")}
             </label>
             <input
               type="tel"
@@ -123,12 +125,12 @@ function NewBooking() {
               value={formData.customer_phone}
               onChange={handleChange}
               className="input-field"
-              placeholder="+251 ..."
+              placeholder={t("new_booking.phone_ph")}
             />
           </div>
           <div>
             <label className="block text-muted text-sm font-medium mb-2">
-              Service Category
+              {t("new_booking.service_category")}
             </label>
             <select
               name="service_type"
@@ -137,7 +139,7 @@ function NewBooking() {
               className="input-field appearance-none bg-white"
             >
               {services.length === 0 && (
-                <option value="">No services configured</option>
+                <option value="">{t("settings.no_services")}</option>
               )}
               {services.map((s) => (
                 <option key={s.id} value={s.name}>
@@ -148,7 +150,7 @@ function NewBooking() {
           </div>
           <div className="md:col-span-2">
             <label className="block text-muted text-sm font-medium mb-2">
-              Package(s)
+              {t("new_booking.packages")}
             </label>
             <div className="flex flex-wrap gap-3">
               {packages.map((pkg) => (
@@ -169,7 +171,7 @@ function NewBooking() {
               ))}
               {packages.length === 0 && (
                 <span className="text-sm text-muted">
-                  No packages configured. Add them in Settings.
+                  {t("settings.no_packages")}
                 </span>
               )}
             </div>
@@ -177,7 +179,7 @@ function NewBooking() {
           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                Start time
+                {t("new_booking.start_time")}
               </label>
               <input
                 required
@@ -190,7 +192,7 @@ function NewBooking() {
             </div>
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                End time
+                {t("new_booking.end_time")}
               </label>
               <input
                 required
@@ -203,7 +205,7 @@ function NewBooking() {
             </div>
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                Due date (Optional)
+                {t("new_booking.due_date")}
               </label>
               <input
                 type="date"
@@ -217,7 +219,7 @@ function NewBooking() {
           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                Quantity
+                {t("new_booking.quantity")}
               </label>
               <input
                 required
@@ -232,7 +234,7 @@ function NewBooking() {
             </div>
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                Agreed price (Total)
+                {t("new_booking.agreed_price")}
               </label>
               <input
                 required
@@ -248,7 +250,7 @@ function NewBooking() {
           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                Amount paid (Optional)
+                {t("new_booking.amount_paid")}
               </label>
               <input
                 type="number"
@@ -261,7 +263,7 @@ function NewBooking() {
             </div>
             <div>
               <label className="block text-muted text-sm font-medium mb-2">
-                Payment method
+                {t("new_booking.payment_method")}
               </label>
               <select
                 name="payment_method"
@@ -269,33 +271,33 @@ function NewBooking() {
                 onChange={handleChange}
                 className="input-field appearance-none bg-white"
               >
-                <option value="Cash">Cash</option>
-                <option value="Transfer">Transfer</option>
+                <option value="Cash">{t("payments.cash")}</option>
+                <option value="Transfer">{t("payments.transfer")}</option>
               </select>
             </div>
           </div>
           <div className="md:col-span-2">
             <label className="block text-muted text-sm font-medium mb-2">
-              Notes
+              {t("new_booking.notes")}
             </label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleChange}
               className="input-field min-h-[100px] resize-y"
-              placeholder="Optional notes"
+              placeholder={t("new_booking.notes_ph")}
             ></textarea>
           </div>
           <div className="md:col-span-2 flex gap-3 mt-2">
             <button type="submit" className="btn">
-              Create booking
+              {t("new_booking.create_btn")}
             </button>
             <button
               type="button"
               className="btn-secondary"
               onClick={handleCancel}
             >
-              Cancel
+              {t("new_booking.cancel_btn")}
             </button>
           </div>
         </form>

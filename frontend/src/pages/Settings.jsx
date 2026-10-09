@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/PageHeader';
 
 function Settings() {
+  const { t } = useTranslation();
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]);
 
@@ -67,61 +69,61 @@ function Settings() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-muted">Loading settings...</div>;
+  if (loading) return <div className="p-8 text-center text-muted">{t("settings.loading")}</div>;
 
   return (
     <>
-      <PageHeader title="Settings" sub="Manage application configuration" />
+      <PageHeader title={t("settings.title")} sub={t("settings.sub")} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Services Manager */}
         <div className="card-panel p-6">
-          <h3 className="font-semibold text-lg mb-4">Service Types</h3>
+          <h3 className="font-semibold text-lg mb-4">{t("settings.service_types")}</h3>
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
               className="input-field flex-1" 
-              placeholder="E.g., Consultation, Basic Repair..." 
+              placeholder={t("settings.service_ph")} 
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd('service', newService)}
             />
-            <button className="btn" onClick={() => handleAdd('service', newService)}>Add</button>
+            <button className="btn" onClick={() => handleAdd('service', newService)}>{t("settings.add_btn")}</button>
           </div>
           <div className="divide-y divide-line border-t border-line">
             {services.map(s => (
               <div key={s.id} className="py-3 flex justify-between items-center group">
                 <span className="text-sm font-medium">{s.name}</span>
-                <button className="text-red-600 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete('service', s.id)}>Remove</button>
+                <button className="text-red-600 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete('service', s.id)}>{t("settings.remove_btn")}</button>
               </div>
             ))}
-            {services.length === 0 && <div className="py-3 text-muted text-sm text-center">No services defined.</div>}
+            {services.length === 0 && <div className="py-3 text-muted text-sm text-center">{t("settings.no_services")}</div>}
           </div>
         </div>
 
         {/* Packages Manager */}
         <div className="card-panel p-6">
-          <h3 className="font-semibold text-lg mb-4">Packages</h3>
+          <h3 className="font-semibold text-lg mb-4">{t("settings.packages")}</h3>
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
               className="input-field flex-1" 
-              placeholder="E.g., Premium, Standard..." 
+              placeholder={t("settings.package_ph")} 
               value={newPackage}
               onChange={(e) => setNewPackage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd('package', newPackage)}
             />
-            <button className="btn" onClick={() => handleAdd('package', newPackage)}>Add</button>
+            <button className="btn" onClick={() => handleAdd('package', newPackage)}>{t("settings.add_btn")}</button>
           </div>
           <div className="divide-y divide-line border-t border-line">
             {packages.map(p => (
               <div key={p.id} className="py-3 flex justify-between items-center group">
                 <span className="text-sm font-medium">{p.name}</span>
-                <button className="text-red-600 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete('package', p.id)}>Remove</button>
+                <button className="text-red-600 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete('package', p.id)}>{t("settings.remove_btn")}</button>
               </div>
             ))}
-            {packages.length === 0 && <div className="py-3 text-muted text-sm text-center">No packages defined.</div>}
+            {packages.length === 0 && <div className="py-3 text-muted text-sm text-center">{t("settings.no_packages")}</div>}
           </div>
         </div>
 
